@@ -5,7 +5,7 @@
 */
 // 链接到主站的地址
 let reqIp = {
-  development: 'http://qsjq.demo.sclonsee.com/api/v1',
+  development: 'http://qsjqadmin.sclonsee.com/api/v1/',
   production: 'http://qsjq.demo.sclonsee.com/api/v1'
 }
 
