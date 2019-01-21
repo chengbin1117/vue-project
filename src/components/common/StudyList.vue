@@ -12,12 +12,12 @@
         <p class="class-type font14 color333 t-l">
             <span class="type">{{item.subject}}</span>
             <span class="line">|</span>
-            <span class="class font12">{{item.course_num}}</span>
+            <span class="class font12">{{item.course_num}}节课</span>
         </p>
         <div class="f-r-sb author">
             <div class="l">
                 <span @click="toTeacher(item)" class="avatar">
-                    <img class="pic-c-c" v-lazy="item.img_path" :data="item.img_path"/>
+                    <img class="pic-c-c" :src="item.img_path" :data="item.img_path"/>
                 </span>
                 <span>{{item.real_name}}</span>
             </div>
@@ -59,7 +59,7 @@ export default {
         }
     },
     toTeacher(item){
-        this.$router.push('/teacher-detail/' + item.id)
+        this.$router.push('/teacher-detail/' + item.admin_uid)
     }
   }
 }

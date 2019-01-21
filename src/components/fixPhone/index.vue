@@ -10,12 +10,12 @@
       <div v-else class="fix">
         <div class="form">
             <div class="f-r phone">
-                <input class="font14 color333" autofocus="true" v-model="phone" placeholder="请输入手机号码"/>
+                <input class="phone-input font16 color333" autofocus="true" v-model="phone" placeholder="请输入手机号码"/>
             </div>
             <div class="f-r">
-                <input class="font14 color333" v-model="code" autofocus="true" placeholder="请输入验证码" />
-                <mt-button v-if="sendVisible"  @click="sendCode" :disabled="!phone" class="code font10 colorbuy">获取验证码</mt-button>
-                <mt-button v-else :disabled="true" class="code resend font10 color999">{{time}}s后重试</mt-button>
+                <input class="font16 color333" v-model="code" autofocus="true" placeholder="请输入验证码" />
+                <mt-button v-if="sendVisible"  @click="sendCode" :disabled="!phone" class="code font12 colorbuy">获取验证码</mt-button>
+                <mt-button v-else :disabled="true" class="code resend font12 color999">{{time}}s后重试</mt-button>
             </div>
         </div>
         <mt-button @click="confirm" :disabled="!phone||!code" class="btn-submit">确认修改</mt-button>
@@ -31,7 +31,6 @@ export default {
   components:{
   },
   watch:{
-
   },
   data () {
     return {
@@ -137,10 +136,16 @@ export default {
                 padding:2.7vw 0;
             }
             .phone{
-                border-bottom:1px solid #ccc;
+                border-bottom:1px solid #ddd;
             }
             input{
                 margin-left:2.7vw;
+                height:8vw;
+                border:0;
+                outline: none;
+            }
+            .phone-input{
+                width:80%;
             }
             .code{
                 position: absolute;

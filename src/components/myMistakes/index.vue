@@ -1,8 +1,8 @@
 <template>
   <div  class="my-mistakes">   
-    <div v-if="visible" @click="handleFold(item)" class="rows" v-for="(item,index) in data" :key="index">
-        <div class="f-r-sb parent">
-            <div class="tit f-r" style="margin-left:5.4vw">
+    <div v-if="visible" @click="handleFold(item)" :class="['rows',item.unfold ? 'unfoldrows': '']" v-for="(item,index) in data" :key="index">
+        <div :class="['f-r-sb', 'parent',!item.unfold ? 'unfoldtit': '']">
+            <div :class="['tit','f-r']" style="margin-left:5.4vw">
                 <i v-if="item.unfold" class="iconfont icon-shouqi-copy"></i>
                 <i v-else class="iconfont icon-shouqi"></i>
                 <span  class="font14 color333">{{item.course_name}}</span>
@@ -10,13 +10,13 @@
             <span style="margin-right:5.4vw" class="font12 color999">（共{{item.num}}题）</span>
         </div>
         <div v-if="!item.unfold" class="child">
-            <p @click="childClick($event,child)" class="f-r-sb" v-for="(child,key) in item.list" :key="key">
-                <span>{{child.question}}</span>
+            <p @click="childClick($event,child,item)" class="f-r-sb" v-for="(child,key) in item.list" :key="key">
+                <span>{{child.course_name}}</span>
                 <i class="iconfont icon-fanhui-copy color999 font18"></i>
             </p>
         </div>
     </div>
-    <div v-else class="no-data f-c">
+    <div v-if="!visible" class="no-data f-c">
         <img src="../../assets/img/zanwucuoti@2x.png" />
         <span class="font14 color999">暂无相关错题哦~</span>
     </div>
@@ -60,7 +60,6 @@ export default {
                 item.unfold = true
             })
             _this.data = data.data;
-            console.log(_this.data)
         }
     })  
   },
@@ -71,11 +70,11 @@ export default {
         handleFold(item){
           item.unfold = !item.unfold
         },
-        childClick(e,item){
+        childClick(e,item,parent){
             console.log('item',item)
             e = e || window.event;
             e.stopPropagation();
-            this.$router.push('mistakes/' + item.id +"/" + item.catalog_id)
+            this.$router.push('mistakes/' + item.id +"/" + item.catalog_id +'/'+parent.num)
             console.log(item)
         }
   }
@@ -109,7 +108,7 @@ export default {
             // padding:0 5.4vw;
             background:#fff;
             .parent{
-                border-bottom:1px solid #ccc;
+                border-bottom:1px solid #ddd;
                 i{
                     font-size:4.8vw;
                     margin-right:2.7vw;
@@ -134,13 +133,18 @@ export default {
             }
         }
         .rows:last-child{
-            .parent{
-                border:0;
-            }
+            // .parent{
+            //     border:0;
+            // }
             .child{
                 p:last-child{
                     border-bottom:0;
                 }
+            }
+        }
+        .unfoldrows:last-child{
+            .parent{
+                border:0;
             }
         }
     }

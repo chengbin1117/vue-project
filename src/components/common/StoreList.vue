@@ -11,7 +11,7 @@
       <div class="pic">
         <img @click="toDetail(item)" class="pic-c-c" v-lazy="item.goods_cover" :data="item.goods_cover"/>
       </div>
-      <p class="tit font14 color333 omit2 t-l">{{item.goods_name}}</p>
+      <p class="tit font14 color333 omit1 t-l">{{item.goods_name}}</p>
       <p v-if="item.goods_type == 1" class="font12 colorbuy">￥{{item.shop_price}}</p>
       <p v-else class="font12 colorbuy">{{item.integral}}积分</p>
     </div>
@@ -23,7 +23,11 @@ export default {
   name: 'StoreList',
   props:{
     list:{},
-    onChange:{}
+    onChange:{},
+    loading: {
+        type: [Boolean],
+        default: false,
+    },
   },
   data () {
     return {
@@ -36,11 +40,7 @@ export default {
   methods:{
     loadMore() {
         const that = this;
-        this.loading = true;
-        setTimeout(() => {
-            that.onChange()
-            that.loading = false;
-        }, 1000);
+        that.onChange()
     },
     toDetail(item){
         if(item.goods_type == 1){
@@ -72,11 +72,12 @@ export default {
                 height:45.9vw;
                 overflow: hidden;
                 border-radius: 1.6vw;
-                border:1px solid #ccc;
+                // border:1px solid #ccc;
             }
             .tit{
                 margin:2.7vw 0;
                 line-height: 4.8vw;
+                height:4.8vw;
             }
 
         }

@@ -21,7 +21,7 @@
             </div>
         </div>
     </div>
-    <mt-button @click="submit" class="btn btn-submit">确定</mt-button>
+    <mt-button @click="submit" :disabled="disabled" class="btn btn-submit">确定</mt-button>
     <div v-if="visible" class="mask"></div>
     <!-- 性别选择弹窗 -->
     <div v-if="visible" class="sex-modal">
@@ -32,18 +32,32 @@
             </mt-radio>
         <p @click="closeModal" class="font18 colorbuy">确定</p>
     </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
+import MsgBox from '@/components/common/MsgBox'
 
 // 个人信息 页面
 export default {
   name: 'MyInfo',
   components:{
+      MsgBox
   },
   watch:{
-
+    'form.nickname'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.username'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.sex'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.image'(newVal,oldVal){
+       this.disabledChange()
+    }
   },
   data () {
     return {
@@ -65,6 +79,9 @@ export default {
         ],
         visible:false,
         base64:'',
+        msgVisible:false,
+        msg:'',
+        disabled:true,
     }
   },
   created(){
@@ -74,6 +91,13 @@ export default {
      Common.InitImg()
   },
   methods:{
+    disabledChange(){
+          if(this.form.nickname!='' &&this.form.username!='' && this.form.sex!=''&& this.form.image!=''){
+              this.disabled = false
+          }else{
+            this.disabled = true
+          }
+    },
     getData(){
         const _this = this;
         let data = new FormData();
@@ -88,6 +112,7 @@ export default {
         })      
     },
     submit(){
+        const _this = this;
         let data = new FormData();
         data.append('token',localStorage.getItem("qtoken"))
         data.append('nickname',this.form.nickname)
@@ -99,7 +124,14 @@ export default {
             type:'post',
             data,
             success(data) {
-                _this.form = data.data;
+                _this.msgVisible = true
+                _this.msg = data.msg
+                setTimeout(function(){
+                    _this.msgVisible = false
+                    if(data.code == 0){
+                        _this.$router.push('/mine')
+                    }
+                },1000)
             }
         })  
     },
@@ -119,6 +151,7 @@ export default {
                 success(data) {
                     if(data.code == 0){
                         _this.base64 = base64
+                        _this.form.image = data.data.url_show
                     }
                 }
             })
@@ -146,6 +179,9 @@ export default {
         background:#f5f5f5;
         height:100%;
         padding-top:2.7vw;
+        .msg-box p{
+            margin-top:100px;
+        }
         .my-avatar{
             position: relative;
             width:100%;
@@ -233,6 +269,7 @@ export default {
             left:0;
             right:0;
             margin:auto;
+            top:40vw;
             .tit{
                 margin-top:5.4vw;
             }
@@ -245,6 +282,11 @@ export default {
     }
 </style>
 <style lang="less">
+    .my-info{
+        .msg-box p{
+            margin-top:100px!important;
+        }
+    }
     body{
         font-family: "PingFangSC","Hiragino Sans GB","Helvetica Neue",Helvetica,tahoma,arial,Verdana,sans-serif,"WenQuanYi Micro Hei","\5B8B\4F53"
     }

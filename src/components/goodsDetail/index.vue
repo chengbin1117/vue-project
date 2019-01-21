@@ -24,15 +24,18 @@
             <p class="desc font14 color333 t-l" v-html="data.content"></p>
         </div>
         <span @click="submit" class="btn-buy">立刻购买</span>
+        <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
+import MsgBox from '@/components/common/MsgBox'
 
 // 商品详情页面
 export default {
   name: 'GoodsDetail',
   components:{
+      MsgBox
   },
   watch:{
 
@@ -41,6 +44,8 @@ export default {
     return {
         swiper:[],// 轮播图片
         data:{}, // 商品详情
+        msgVisible:false,
+        msg:''
     }
   },
   created(){
@@ -66,6 +71,15 @@ export default {
   },
   methods:{
       submit(){
+           const _this = this
+            if(this.data.stock == 0){
+                _this.msgVisible = true
+                _this.msg = '暂无库存'
+                setTimeout(function(){
+                    _this.msgVisible = false
+                },1000)
+                return
+            }
           this.$router.push('/goods-order/' + this.data.id)
       }
   }

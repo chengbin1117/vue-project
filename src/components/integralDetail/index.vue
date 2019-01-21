@@ -2,11 +2,11 @@
   <div  class="integral-detail">   
     <div class="detail f-r-sb" v-for="(item,index) in data" :key="index">
         <div class="f-c-c">
-            <p class="font16 color333 t-l">{{item.tit}}</p>
-            <p class="font12 color999 t-l mart10">{{item.time}}</p>
+            <p class="font16 color333 t-l">{{item.content}}</p>
+            <p class="font12 color999 t-l mart10">{{item.add_time}}</p>
         </div>
         <p class="f-c-c">
-            <span class="font16 color333">{{item.num >= 0 ? '+' + item.num : item.num}}</span>
+            <span class="font16 color333">{{item.type == 1 ? '+' + item.integral : '-'+ item.integral}}</span>
         </p>
     </div>
   </div>
@@ -28,14 +28,23 @@ export default {
   },
   data () {
     return {
-        data:[
-            {tit:'课程抵扣',time:'2019-1-1',num:'500'},
-            {tit:'课程抵扣',time:'2019-1-1',num:'-100'},
-            {tit:'课程抵扣',time:'2019-1-1',num:'500'},
-            {tit:'课程抵扣',time:'2019-1-1',num:'-400'},
-            {tit:'课程抵扣',time:'2019-1-1',num:'500'},
-        ]
+        data:[],
+        page:1
     }
+  },
+  created(){
+    const _this = this
+    let postdata = new FormData();
+    postdata.append('token',localStorage.getItem('qtoken'))
+    postdata.append('page',this.page)
+    this.ajax({
+        url: "/member/integral-detail",
+        type:'post',
+        data:postdata,
+        success(data) {
+            _this.data = data.data
+        }
+    })
   },
   mounted(){
      Common.InitImg()

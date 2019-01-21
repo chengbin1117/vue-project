@@ -4,7 +4,7 @@
         <p class="page">
             <span>{{data.sn}}</span>
             <span>/</span>
-            <span>10</span>
+            <span>{{data.count}}</span>
         </p>
         <p class="topic font16 color333 t-l">{{data.question}}？（）</p>
         <div class="answer">
@@ -18,6 +18,7 @@
     <div class="analysis">
         <p class="font14 color333">解析</p>
         <div class="font14 color333 mart10">{{data.analysis_txt}}</div>
+        <img @click="previewHandle(data.analysis_img)" v-if="data.analysis_img" :src="data.analysis_img"/>
     </div>
     <div class="handel mart10 f-c">
         <div class="f-r">
@@ -25,18 +26,24 @@
             <span @click="next" v-if="!isend" :class="[sn ==1 ? '' : 'half-btn','red-btn','font18','colorfff']">下一题</span>
             <span @click="toMyMistakes" v-if="isend" class="half-btn red-btn font18 colorfff">返回错题本</span>
         </div>
-        <!-- <span @click="next" v-if="isover && !isend" class="red-btn font18 colorfff">下一题</span> -->
         <span @click="pushmistakes"  class="font14 color666">移出错题本</span>
+    </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
+    <div @click="closePreview" v-if="previewVisible" class="preview-visible">
+        <img :src="preview"/>
     </div>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
 import { mapState } from "vuex";
+import MsgBox from '@/components/common/MsgBox'
+
 // 错题页面
 export default {
   name: 'Mistakes',
   components:{
+    MsgBox
   },
   watch:{
 
@@ -58,21 +65,41 @@ export default {
         isover:false, // 答题结束
         isend:false, // 是否为最后一题
         last_id:'',
+        next_id:'',
         sn:'',
-        catalog_id:''
+        catalog_id:'',
+        msgVisible:false,
+        msg:'',
+        previewVisible:false,
+        preview:'',
+        is_last:''
     }
   },
   created(){
-      this.id = this.$route.params.id
+      this.id = ''
       this.catalog_id = this.$route.params.catalog_id
-      console.log('id',this.id)
-      this.getData()
       this.token = localStorage.getItem('qtoken')
+      this.num = this.$route.params.num
+      this.getData()
+
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
+      closePreview(){
+        this.previewVisible = false;
+        const _meta = document.getElementsByTagName('meta')[1]
+        _meta.content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"
+        document.getElementsByTagName('body')[0].style.overflow = 'auto'
+      },
+      previewHandle(item){
+        this.preview = item;
+        this.previewVisible = true
+        const _meta = document.getElementsByTagName('meta')[1]
+        _meta.content="width=device-width, initial-scale=1.0;"
+        document.getElementsByTagName('body')[0].style.overflow = 'hidden'
+      },
       toMyMistakes(){
           this.$router.push('/my-mistakes')
       },
@@ -82,6 +109,7 @@ export default {
         objectdata.append('catalog_id',this.catalog_id)
         objectdata.append('is_error','1')
         objectdata.append('id',this.id)
+        objectdata.append('token',this.token)
         // 获取练习题目
         this.ajax({
             url: "/course/practice",
@@ -90,9 +118,10 @@ export default {
             success(data) {
                 data = data.data;
                 _this.data = data;
-                _this.id = data.next_id;
+                _this.next_id = data.next_id;
                 _this.sn = data.sn;
                 _this.last_id = data.last_id
+                _this.is_last = data.is_last
                 _this.answerlist[0].val = data.a
                 _this.answerlist[1].val = data.b
                 _this.answerlist[2].val = data.c
@@ -117,14 +146,13 @@ export default {
       },
       // 下一题
       next(){
+        this.id = this.next_id
         this.getData()
       },
       // 上一题
       last(){
           this.id = this.last_id;
           this.getData()
-          console.log('last',this.last_id)
-          console.log('id',this.id)
       },
       // 移除错题集
       pushmistakes(){
@@ -141,7 +169,24 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.toMyMistakes()
+                    _this.msgVisible = true
+                    if(data.code == 0){
+                        _this.msg = '移出成功'
+                         setTimeout(function(){
+                            _this.msgVisible = false
+                        },1000)
+                        if(_this.is_last == 1){
+                            if(_this.sn == 1){
+                                 _this.toMyMistakes()
+                            }else{
+                                _this.last()
+                            }
+                        }else{
+                            _this.next()
+                        }
+                    }else{
+                        _this.msg = data.msg
+                    }
                 }
             }
         })    
@@ -152,10 +197,28 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+    .preview-visible{
+        position: fixed;
+        background:#000;
+        width:100%;
+        height:100%;
+        top:0;
+        left:0;
+        z-index:999;
+        img{
+            width: 90%;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+    }
     .exercises{
         width:100%;
         background:#f5f5f5;
-        height:100%;
+        min-height:100%;
         padding:2.7vw;
         .subject{
             position: relative;
@@ -251,6 +314,10 @@ export default {
             margin-top:2.7vw;
             border-radius: 1.6vw;
             text-align: left;
+            img{
+                width:90%;
+                margin:10px auto;
+            }
         }
         .handel{
             width:100%;

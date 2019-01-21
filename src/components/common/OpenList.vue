@@ -2,16 +2,16 @@
   <div class="open-class-lists">
     <div @click="toDetail(item)" class="list" v-for="(item,index) in list" :key="index">
         <div class="list-t">
-            <span>{{item.classType}}</span>
+            <span>{{item.course_type == 10 ? '音频课' :'录播课'}}</span>
             <img class="pic-c-c" v-lazy="item.course_cover" :data="item.course_cover"/>
         </div>
         <div class="list-b">
-            <p class="omit2 font14 color333 martb10">{{item.course_name}}</p>
+            <p class="omit1 font14 color333 martb10">{{item.course_name}}</p>
             <p class="f-r-sb">
-                <span v-if="true" class="free font12">{{item.type}}</span>
-                <span v-if="false" class="limit font12">{{item.type}}</span>
-                <span v-if="false" class="buy font12">{{item.type}}</span>
-                <span class="font12 color999">{{item.sales_num}}报名</span>
+                <span v-if="item.charge_type == 10" class="free font14">免费</span>
+                <span v-if="item.charge_type == 20 && item.time_limit" class="limit font14">限时观看</span>
+                <span v-if="item.charge_type == 20 && !item.time_limit" class="colorbuy font14">￥{{item.price}}</span>
+                <span class="font12 color999">{{item.sales_num}}人报名</span>
             </p>
         </div>
     </div>
@@ -65,8 +65,12 @@ export default {
             span{
                 position: absolute;
                 display: inline-block;
-                width:13.4vw;
-                height:5.4vw;
+                // width:13.4vw;
+                // height:5.4vw;
+                // line-height:5.4vw;
+                // text-align: center;
+                padding:1.1vw 2.7vw 1.1vw 1.3vw;
+                font-size:3.2vw;
                 color:#fff;
                 background:rgba(0,0,0,0.3);
                 border-top-right-radius:2.7vw;
@@ -80,15 +84,13 @@ export default {
             border-bottom:1px solid #ddd;
             margin-bottom:5.4vw;
             padding-bottom:4vw;
-            .omit2{
+            .omit1{
                 text-align: left;
                 line-height:4.8vw;
+                height:4.6vw;
             }
             .free{
                 color:#41B5A3;
-            }
-            .but{
-                color:#EB4C49;
             }
             .limit{
                 color:#F58F44;

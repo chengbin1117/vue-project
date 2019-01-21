@@ -102,6 +102,14 @@ export default {
         const _this = this;
         this.id = this.$route.params.id;
         let data = new FormData();
+        if(!this.data2){
+            this.msgVisible = true
+            _this.msg = '请先选择地址'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+            return
+        }
         data.append('token',localStorage.getItem('qtoken'))
         data.append('id',this.id)
         data.append('user_name',this.data2.user_name)
@@ -115,13 +123,13 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.$router.push('/pay-success/' + data.data)
+                    _this.$router.push('/pay-success/' + data.data +'/3')
                 }else{
                     _this.msgVisible = true
                     _this.msg = data.msg
                     setTimeout(function(){
                         _this.msgVisible = false
-                    },2000)
+                    },1000)
                 }
             }
         })
@@ -226,10 +234,15 @@ export default {
             }
         }
         .warning{
-            font-size:3.2px;
             color:#fa8f44;
             text-align: left;
             padding-left:4.3vw;
+            i{
+                font-size:3.2vw;
+            }
+            span{
+                font-size:3.2vw;
+            }
         }
         .order-footer{
             width:100%;

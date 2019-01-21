@@ -4,7 +4,7 @@
         <p class="tit font16 color333 t-l">商品信息</p>
         <div class="goods-info f-r">
             <div class="l">
-                <img class="pic-c-c" v-lazy="course.course_cover" :data='course.course_cover'/>
+                <img class="pic-c-c" :src="course.course_cover" :data='course.course_cover'/>
                 <span class="type font10">{{course.course_type != 10 ? '录播课':'音频课'}}</span>
             </div>
             <div class="r f-c-c">
@@ -14,8 +14,8 @@
         </div>
         <div v-if="isSingle" class="singly">
             <p class="f-r-sb" v-for="(item,index) in catalog" :key="index">
-                <span class="font16 color333 omit1">01 基本初等函数初等函数···</span>
-                <span class="font14 colorbuy omit1">￥35.00</span>
+                <span class="font16 color333 omit1 t-l">{{item.course_name}}</span>
+                <span class="font14 colorbuy omit1">￥{{item.price}}</span>
             </p>
         </div>
     </div>
@@ -23,23 +23,23 @@
         <span class="font16 color333">积分抵扣</span>
         <span class="font14 color666">{{course.integral_desc}}</span>
         <div class="check">
-            <input type="checkbox" v-model="checked" @click="checkboxOnclick" >
-            <i v-if="checked" class="iconfont icon-select colorbuy"></i>
+            <input type="checkbox" v-model="checked" @change="checkboxOnclick" >
+            <i v-if="checked && course.can_integral==1" class="iconfont icon-select colorbuy"></i>
             <i v-else class="iconfont icon-select color999"></i>
         </div>
     </div>
     <div   class="pay f-c mart10">
         <p class="f-r-sb">
             <span class="font16 color333">支付金额</span>
-            <span class="font16 color999">￥{{course.price}}</span>
+            <span class="font16 color999">￥{{isSingle ? toFixed(singlePrice): course.price}}</span>
         </p>
-        <p v-if="checked" class="f-r-sb">
+        <p v-if="checked && course.can_integral==1" class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
-            <span class="font16 color999">-￥{{course.discount}}</span>
+            <span class="font16 color999">-￥{{toFixed(course.discount)}}</span>
         </p>
         <p class="f-r-sb">
             <span class="font16 color333">实付金额</span>
-            <span class="font16 colorbuy">￥{{course.total}}</span>
+            <span class="font16 colorbuy">￥{{isSingle ? toFixed(singlePrice):toFixed(course.total)}}</span>
         </p>
     </div>
     <div class="pay-way f-r-sb">
@@ -52,19 +52,25 @@
     <div class="order-footer f-r">
         <div class="footer-pay f-r-c">
             <span class="font14 color333">实付：</span>
-            <span class="font18 colorbuy">￥{{course.total}}</span>
+             <p class="f-c-c total" style="line-height:0">
+                <span class="font18 colorbuy">￥{{isSingle ? toFixed(singlePrice):toFixed(course.total)}}</span>
+                <span v-if="checked && course.can_integral==1" class="font12 color999 t-l">( 已抵扣￥{{toFixed(course.discount)}} )</span>
+            </p>
         </div>
         <div @click="confirm" class="confirm font18 colorfff t-c">确认支付</div>
     </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
+import MsgBox from '@/components/common/MsgBox'
 
 // 课程订单页面
 export default {
   name: 'ClassOrder',
   components:{
+      MsgBox
   },
   watch:{
 
@@ -87,9 +93,12 @@ export default {
             price:'',
             total:'',
         }, // 全套
+        singlePrice:0,
         catalog:null, // 单个
         is_integral:null, // 是否使用积分,
-        img:''
+        img:'',
+        msgVisible:false,
+        msg:''
     }
   },
   mounted(){
@@ -115,11 +124,12 @@ export default {
         success(data) {
             if(data.code == 0){
                 data = data.data
-                data.course.course_cover = 'https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2929441361,1166167046&fm=173&app=25&f=JPEG?w=218&h=146&s=BCC381544AE6ACCC16E68E830300308F'
-                _this.img= 'https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2929441361,1166167046&fm=173&app=25&f=JPEG?w=218&h=146&s=BCC381544AE6ACCC16E68E830300308F'
                 _this.course = data.course
                 _this.course.total = parseInt(_this.course.price)
                 _this.catalog = data.catalog
+                data.catalog.forEach( (item)=>{
+                    _this.singlePrice += parseInt(item.price)
+                })
                 _this.isIntegralGoods = data.course.integral == 0 ? false : true
             }
         }
@@ -127,15 +137,27 @@ export default {
   },
   methods:{
       checkboxOnclick(){
-        if(!this.checked){
+        const _this = this;
+        if(this.course.can_integral == 0){
+            _this.msgVisible = true
+            _this.msg = '积分不足'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+            this.checked = false
+            return 
+        }
+        if(this.checked){
             this.course.total = parseInt(this.course.price) - parseInt(this.course.discount)
         }else{
             this.course.total = parseInt(this.course.price)
         }
+        console.log('checked',this.checked)
+
       },
       confirm(){
         const  _this = this;
-        let is_integral = this.course.integral == 0 ? 0 : 1;
+        let is_integral = this.checked ? 1 : 0;
         let data = new FormData();
         data.append('token',localStorage.getItem('qtoken'))
         if( this.course_id != 0){
@@ -150,10 +172,19 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.$router.push('/pay-success/'+ data.data)
+                    _this.$router.push('/pay-success/'+ data.data + '/1')
+                }else{
+                    _this.msgVisible = true
+                    _this.msg = data.msg
+                    setTimeout(function(){
+                        _this.msgVisible = false
+                    },1000)   
                 }
             }
         }) 
+      },
+      toFixed(item){
+          return parseInt(item).toFixed(2)
       }
   }
 }
@@ -164,7 +195,8 @@ export default {
     .class-order{
         width:100%;
         background:#f5f5f5;
-        height:100%;    
+        min-height:100%;   
+        padding-bottom: 13.4vw;
         // padding:0 2.7vw;
         .tit{
             background:#fff;
@@ -281,6 +313,8 @@ export default {
         .order-footer{
             width:100%;
             height:13.4vw;
+            position: fixed;
+            bottom:0;
             .footer-pay,.confirm{
                 width:50%;
             }
@@ -293,6 +327,11 @@ export default {
             .confirm{
                 background:#EB4C49;
                 line-height: 13.4vw;
+            }
+            .total{
+                span{
+                    line-height:4.8vw;
+                }
             }
         }
     }

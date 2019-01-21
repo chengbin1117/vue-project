@@ -3,9 +3,9 @@
     <div class="rules" v-for="(item,index) in rules" :key="index">
         <div class="header f-r">
             <span class="font18">Q</span>
-            <span class="font16">{{item.tit}}</span>
+            <span class="font16">{{item.title}}</span>
         </div>
-        <p class="t-l">{{item.desc}}</p>
+        <p class="t-l" v-html="item.description"></p>
     </div>
 
   </div>
@@ -27,14 +27,20 @@ export default {
   },
   data () {
     return {
-        rules:[
-            {desc:'123123123123123',tit:'什么是积分'},
-            {desc:'123123123123123',tit:'什么是积分'},
-            {desc:'123123123123123',tit:'什么是积分'},
-            {desc:'123123123123123',tit:'什么是积分'},
-            {desc:'123123123123123',tit:'什么是积分'}
-        ]
+        rules:[]
     }
+  },
+  created(){
+    const _this = this
+    let postdata = new FormData();
+    this.ajax({
+        url: "/account/integral-rule",
+        type:'post',
+        data:postdata,
+        success(data) {
+            _this.rules = data.data
+        }
+    })
   },
   mounted(){
      Common.InitImg()

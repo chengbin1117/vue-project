@@ -7,7 +7,7 @@
             <i v-else class="iconfont icon-xiala1-copy"></i>
         </div>
         <!-- 年级类型 -->
-        <div v-if="isExtend[0].isShow" class="type-extend f-r">
+        <div v-if="isExtend[0].isShow" :class="['type-extend','f-r',gradeList.length != 0 ?'type-extend-sp' : '']">
             <div  class="grade">
                 <p @click="gradeSelect($event,item)" :class="item.class" v-for="(item,index) in gradeList" :key="index">{{item.name}}</p>
             </div>
@@ -26,7 +26,8 @@
     </div>
     <div v-if="hasData" class="content">
         <div v-if="isExtend[typeIndex].isShow" class="mask"></div>
-        <class-list :list="classData" :onChange="getClassData"/>
+        <class-list :list="classData" :onChange="getClassData" :loading="loadMore"/>
+        <p style="padding:2.7vw 0;" v-if="loadMore" class="content-footer color999 font12">这里是底线~</p>
     </div>
     <div v-else class="no-data f-c">
         <img src="../../assets/img/meiyoukecheng@2x.png" />
@@ -37,7 +38,7 @@
 </template>
 <script>
 import Common from '@/assets/js/common.js'
-import ClassList from "@/components/common/ClassList"
+import ClassList from "@/components/common/RecommendList"
 
 // 名师推荐页面
 export default {
@@ -77,7 +78,7 @@ export default {
         ], // 分类类型
         gradeParentSelect:'0', // 年级父级被选中项
         gradeChildSelect:'0', // 年级子级被选中项
-        subjectSelect:'0', // 学科被选中项
+        subjectSelect:'全部', // 学科被选中项
         classData:[  
           {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'},
           {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'},
@@ -93,7 +94,8 @@ export default {
             {isShow:false}
         ], // 是否展开
         page:1, // 页码
-        hasData:false
+        hasData:false,
+        loadMore:false,
     }
   },
     created(){
@@ -141,7 +143,7 @@ export default {
         let data = new FormData();
         data.append('page',this.page)
         data.append('grade',this.gradeChildSelect)
-        data.append('subject',this.subjectSelect)
+        data.append('subject',this.subjectSelect == '全部' ? '0' : this.subjectSelect)
         this.ajax({
             url: "/teacher/recommend2",
             type:'post',
@@ -151,13 +153,41 @@ export default {
                     _this.hasData = false
                     return
                 }
+                if(data.data.length < 10){
+                    _this.loadMore = true
+                }
                 _this.hasData = true
                _this.classData = data.data
             }
         })
     },
     getClassData(){
-        //   this.classData.push( {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'})
+     if(this.loadMore){
+            return
+        }
+        this.page++
+        const _this = this;
+          let data = new FormData();
+        data.append('page',this.page)
+        data.append('grade',this.gradeChildSelect)
+        data.append('subject',this.subjectSelect == '全部' ? '0' : this.subjectSelect)
+        this.loadMore = true
+        this.ajax({
+            url: "/course/list",
+            type:'post',
+            data,
+            success(data) {
+                if(data.data.length == 0){
+                    _this.loadMore = true
+                    return
+                }
+                _this.loadMore = false
+                data = data.data;
+                data.forEach(item=>{
+                    _this.classData.push(item)
+                })
+            }
+        })
     },
     // 展开分类
     unfold(item,index){
@@ -180,7 +210,7 @@ export default {
             }
         })
         this.subjectList.forEach(item =>{
-            if(item.id == _this.subjectSelect){
+            if(item.title == _this.subjectSelect){
                 item.class = 'font14 color333 active text-l'
             }
         })
@@ -189,6 +219,14 @@ export default {
                 item.class = 'font14 color333 active text-l'
             }
         })
+        for(var i in this.isExtend){
+            if(this.isExtend[i].isShow){
+                document.getElementsByTagName('body')[0].style.overflow = 'hidden'
+                return
+            }else{
+                document.getElementsByTagName('body')[0].style.overflow = 'auto'
+            }
+        }
     },
     // 父分类操作
     gradeSelect(e,item){
@@ -214,6 +252,14 @@ export default {
             }
             }
         })
+        for(var i in this.isExtend){
+            if(this.isExtend[i].isShow){
+                document.getElementsByTagName('body')[0].style.overflow = 'hidden'
+                return
+            }else{
+                document.getElementsByTagName('body')[0].style.overflow = 'auto'
+            }
+        }
     },
     // 子分类操作
     childSelect(e,item,type){
@@ -222,16 +268,21 @@ export default {
         this.type = '3';
         if(type === 'grade'){
             this.gradeChildSelect = item.grade
+            this.classType[0].name = item.name
         }else if(type === 'subject'){
-            this.subjectSelect = item.id
+            this.subjectSelect = item.title
+            this.classType[1].name = item.title
         }else{
             this.otherSelect = item.type
+            this.classType[2].name = item.name
         }
         for(var i in this.classType){
             this.classType[i].isDown = true
         }
         this.isExtend[this.typeIndex].isShow = false;
+        this.page = 1;
         this.getData()
+         document.getElementsByTagName('body')[0].style.overflow = 'auto'
     },
     resetClass(item,name){
         for(var i = 0,l = item.length;i < l;i++){
@@ -248,7 +299,7 @@ export default {
         width:100%;
         background:#f5f5f5;
         padding-top:2.7vw;
-        height:100%;
+        min-height:100%;
         .no-data{
             position: fixed;
             width: 100%;
@@ -266,7 +317,7 @@ export default {
             height:12vw;
             line-height: 12vw;
             background:#fff;
-            border-bottom:1px solid #ccc;
+            border-bottom:1px solid #ddd;
             .class-type{
                 position: relative;
                 width:50%;
@@ -285,7 +336,8 @@ export default {
             }
             .type-extend{
                     position: absolute;
-                    background:#fff;
+                    background:#f5f5f5;
+                    height:72vw;
                     width:100%;
                     max-height:117.4vw;
                     // max-height:72vw;
@@ -307,8 +359,11 @@ export default {
                     }
                     .grade-child{
                         flex:1;
+                        background:#fff;
                         p{
                             padding:4vw 0;
+                            background:#fff;
+
                         }
                         .text-l{
                             text-align: left;
@@ -320,6 +375,15 @@ export default {
                             color:#EB4C49;
                         }
                     }
+            }
+            .type-extend-sp{
+                .grade{
+                    height:72vw;
+                    position: fixed;
+                }
+                .grade-child{
+                    padding-left:32vw;
+                }
             }
         }    
     }

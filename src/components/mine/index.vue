@@ -2,7 +2,7 @@
   <div  class="mine">   
     <div  class="mine-info f-c-c">
         <div @click="toMyInfo" class="avatar">
-            <img class="pic-c-c" v-lazy="info.image" :data="info.image"/>
+            <img class="pic-c-c" :src="info.image" :data="info.image"/>
         </div>
         <p @click="toMyInfo" class="font16 colorfff omit1">{{info.nickname}}</p>
         <i @click="toSign" class="iconfont icon-qiandao"></i>
@@ -57,7 +57,7 @@ export default {
         ], // 订单状态
         others:[
             {name:'我的积分',icon:'colorbuy iconfont icon-jifen',link:'/my-integral'},
-            {name:'我的地址',icon:'colorbuy iconfont icon-dizhi',link:'my-address/-1'},
+            {name:'我的地址',icon:'colorbuy iconfont icon-dizhi',link:'/my-address/-1'},
             {name:'邀请好友',icon:'colorbuy iconfont icon-yaoqinghaoyou',link:'/invite'},
             {name:'手机号',icon:'colorbuy iconfont icon-shouji1',link:'/fix-phone'},
             {name:'帮助与反馈',icon:'colorbuy iconfont icon-fankui3',link:'/feed-back'},
@@ -68,6 +68,7 @@ export default {
   },
   created(){
     this.getData()
+    localStorage.setItem('lastPath','/my-address/-1')
   },
   mounted(){
      Common.InitImg()
@@ -121,6 +122,7 @@ export default {
                 height: 4.3vw;
                 overflow: hidden;
                 margin: 0 auto;
+                display: inline-block!important;
             }
             i{
                 position: absolute;
@@ -143,7 +145,7 @@ export default {
             .t{
                 width:100%;
                 height:13.4vw;
-                border-bottom:1px solid #ccc;
+                border-bottom:1px solid #ddd;
                 .t-item{
                     margin:0 2.7vw;
                     line-height: 13.4vw;
@@ -183,6 +185,7 @@ export default {
             padding:0 2.7vw;
             background:#fff;
             margin-top:30.2vw;
+            padding-bottom:13.2vw;
             .other-item{
                 height:12vw;
                 line-height: 12vw;

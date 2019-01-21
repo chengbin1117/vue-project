@@ -1,6 +1,5 @@
 import axios from 'axios'
 import config from './config'
-import state from '../../store/state'
 // import store from '@/store'
 // import M from './cookies'
 // const vm = this

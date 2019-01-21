@@ -4,7 +4,7 @@
         <p class="page">
             <span>{{data.sn}}</span>
             <span>/</span>
-            <span>10</span>
+            <span>{{data.count}}</span>
         </p>
         <p class="topic font16 color333 t-l">{{data.question}}</p>
         <div class="answer">
@@ -26,21 +26,29 @@
     <div v-if="isover" class="analysis">
         <p class="font14 color333">解析</p>
         <div class="font14 color333 mart10">{{data.analysis_txt}}</div>
+        <img @click="previewHandle(data.analysis_img)" v-if="data.analysis_img" :src="data.analysis_img"/>
     </div>
     <div class="handel mart10 f-c">
         <span @click="next" v-if="isover && !isend" class="red-btn font18 colorfff">下一题</span>
         <span @click="toResult" v-if="isover && isend" class="red-btn font18 colorfff">查看结果</span>
-        <span @click="pushmistakes" v-if="isover && !isend" class="font14 color666">移入错题本</span>
+        <span @click="pushmistakes" v-if="isover" class="font14 color666">移入错题本</span>
+    </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
+    <div @click="closePreview" v-if="previewVisible" class="preview-visible">
+        <img :src="preview"/>
     </div>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
 import { mapState } from "vuex";
+import MsgBox from '@/components/common/MsgBox'
+
 // 练习题页面
 export default {
   name: 'Exercises',
   components:{
+      MsgBox
   },
   watch:{
 
@@ -61,10 +69,14 @@ export default {
         istrue:false, // 是否答对
         isover:false, // 答题结束
         isend:false, // 是否为最后一题
+        token:'',
+        msgVisible:false,
+        msg:'',
+        preview:'',
+        previewVisible:false
     }
   },
   created(){
-    //   this.id = this.$route.course_id != 0 ? this.$route.course_id : null
       this.getData()
       this.token = localStorage.getItem('qtoken')
   },
@@ -72,16 +84,30 @@ export default {
      Common.InitImg()
   },
   methods:{
+      closePreview(){
+        this.previewVisible = false;
+        const _meta = document.getElementsByTagName('meta')[1]
+        _meta.content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"
+        document.getElementsByTagName('body')[0].style.overflow = 'auto'
+      },
+      previewHandle(item){
+        this.preview = item;
+        this.previewVisible = true
+          const _meta = document.getElementsByTagName('meta')[1]
+          _meta.content="width=device-width, initial-scale=1.0;"
+         document.getElementsByTagName('body')[0].style.overflow = 'hidden'
+      },
       checkboxOnclick(){
           
       },
       toResult(){
-          this.$router.push('/result')
+          this.$router.push('/result/'+this.$route.params.id +'/'+this.$route.params.course_id)
       },
       getData(){
         const _this = this;
         let objectdata = new FormData();
         objectdata.append('catalog_id',this.$route.params.id)
+        objectdata.append('token',localStorage.getItem('qtoken'))
         if(this.id){
             objectdata.append('id',this.id)
         }
@@ -91,20 +117,30 @@ export default {
             type:'post',
             data:objectdata,
             success(data) {
-                data = data.data;
-                _this.data = data;
-                _this.id = data.next_id;
-                _this.answerlist[0].val = data.a
-                _this.answerlist[1].val = data.b
-                _this.answerlist[2].val = data.c
-                _this.answerlist[3].val = data.d
-                // 初始化状态
-                _this.istrue = false
-                _this.isover = false
-                _this.isend = data.is_last == 1 ? true : false
-                for(var i in _this.answerlist){
-                    _this.answerlist[i].class = ''
+                if(data.code == 0){
+                    data = data.data;
+                    _this.data = data;
+                    _this.id = data.next_id;
+                    _this.answerlist[0].val = data.a
+                    _this.answerlist[1].val = data.b
+                    _this.answerlist[2].val = data.c
+                    _this.answerlist[3].val = data.d
+                    // 初始化状态
+                    _this.istrue = false
+                    _this.isover = false
+                    _this.isend = data.is_last == 1 ? true : false
+                    for(var i in _this.answerlist){
+                        _this.answerlist[i].class = ''
+                    }
+                }else{
+                    _this.msgVisible = true
+                    _this.msg = data.msg
+                    setTimeout(function(){
+                        _this.msgVisible = false
+                        _this.$router.push(localStorage.getItem('classPath'))
+                    },1000)
                 }
+
             }
         }) 
       },
@@ -112,7 +148,7 @@ export default {
       choose(item){
         const _this = this;
         let answerdata = new FormData();
-        answerdata.append('catalog_id','36')
+        answerdata.append('catalog_id',this.$route.params.id)
         answerdata.append('id',this.data.id)
         answerdata.append('answer',item.label.toLowerCase())
         answerdata.append('is_last',this.data.is_last)
@@ -146,7 +182,7 @@ export default {
       pushmistakes(){
         const _this = this;
         let data = new FormData();
-        data.append('catalog_id','36')
+        data.append('catalog_id',this.$route.params.id)
         data.append('id',this.data.id)
         data.append('token',this.token)
         // 获取练习题目
@@ -155,6 +191,11 @@ export default {
             type:'post',
             data,
             success(data) {
+                _this.msgVisible = true
+                _this.msg = data.msg
+                setTimeout(function(){
+                    _this.msgVisible = false
+                },1000)
             }
         })    
       }
@@ -163,11 +204,40 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style lang="less">
+    .exercises{
+        .msg-box{
+            position: fixed;
+            top:0;
+            bottom:0;
+            margin:auto;
+            min-height:100%;
+        }
+    }
+</style>
 <style scoped lang="less">
+    .preview-visible{
+        position: fixed;
+        background:#000;
+        width:100%;
+        height:100%;
+        top:0;
+        left:0;
+        z-index:999;
+        img{
+            width: 90%;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+    }
     .exercises{
         width:100%;
         background:#f5f5f5;
-        // height:100%;
+        min-height:100%;
         padding:2.7vw;
         .subject{
             position: relative;
@@ -263,6 +333,10 @@ export default {
             margin-top:2.7vw;
             border-radius: 1.6vw;
             text-align: left;
+            img{
+                width:90%;
+                margin:10px auto;
+            }
         }
         .handel{
             width:100%;

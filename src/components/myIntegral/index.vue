@@ -2,7 +2,7 @@
   <div  class="my-integral">   
     <div class="info f-c-c">
         <p class="font12 color333">当前积分</p>
-        <p class="colorbuy integral">520</p>
+        <p class="colorbuy integral">{{info.integral}}</p>
         <router-link to="integral-detail" class="integral-detail">
             <i class="iconfont icon-jifen"></i>
             <span class="font14 color333" >积分明细</span>
@@ -20,6 +20,7 @@
             <span class="font14 color999">暂无相关商品哦~</span>
         </div>
     </div>
+    <p style="padding:2.7vw 0;"  v-if="loadMore" class="content-footer color999 font12">这里是底线~</p>
   </div>
 </template>
 <script>
@@ -41,11 +42,14 @@ export default {
     return {
         storeList:[], // 相关课程数据
         page:1,
-        cat_id:0
+        cat_id:0,
+        info:{},
+        loadMore:false,
     }
   },
   created(){
       this.getData()
+      this.getMyIntegral()
   },
   mounted(){
      Common.InitImg()
@@ -62,12 +66,52 @@ export default {
             type:'post',
             data,
             success(data) {
+                if(data.data.length < 10){
+                    _this.loadMore = true
+                }
                 _this.storeList = data.data
             }
         })    
     },
+    getMyIntegral(){
+        const _this = this;
+        let data = new FormData();
+        data.append('token',localStorage.getItem('qtoken'))
+        this.ajax({
+            url: "/member/userinfo",
+            type:'post',
+            data,
+            success(data) {
+                _this.info = data.data;
+            }
+        })      
+    },
     getStoreList(){
-        // this.storeList.push( {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'})
+        if(this.loadMore){
+            return
+        }
+        this.page++
+        const _this = this;
+        let data = new FormData();
+        data.append('goods_type',2)
+        data.append('page',this.page)
+        this.loadMore = true
+        this.ajax({
+            url: "/goods/list",
+            type:'post',
+            data,
+            success(data) {
+                if(data.data.length == 0){
+                    _this.loadMore = true
+                    return
+                }
+                _this.loadMore = false
+                data = data.data;
+                data.forEach(item=>{
+                    _this.storeList.push(item)
+                })
+            }
+        })
     },
   }
 }
@@ -78,7 +122,7 @@ export default {
     .my-integral{
         width:100%;
         background:#f5f5f5;
-        height:100%;
+        min-height:100%;
         padding-top:2.7vw; 
         .no-data{
             position: fixed;
@@ -110,6 +154,8 @@ export default {
                 position: absolute;
                 right:5.4vw;
                 top:5.4vw;
+                color:#63AAF5!important;
+                font-size:3.8vw;
             }
             .integral-detail{
                 position: absolute;

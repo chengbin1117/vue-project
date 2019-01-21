@@ -11,32 +11,33 @@
             </div>
             <span class="line"></span>
             <div class="s-input f-r">
-                <i class="iconfont icon-sousuo font18 color999 marr10"></i>
+                <i class="iconfont icon-sousuo font18 color999"></i>
                 <input v-model="searchVal" autofocus="true" class="font14 color333" placeholder="请输入搜索内容" />
                 <i @click="clear" v-if="searchVal" class="iconfont icon-shanchu1 font15 color999 marr10"></i>
             </div>
         </div>
         <span class="r font14 color333 marl10" @click="onSearch">搜索</span>
     </header>
-    <div v-if="hasData" class="content" >
-        <search-init v-if="initVisible" :history="searchData" :reset="resetHistory" :getData="getData"/>
+    <div v-if="hasData && listResult.length!=0" class="content" >
+        <search-init v-if="false" :history="searchData" :reset="resetHistory" :getData="getData"/>
         <!-- 相关课程 -->
-        <div v-if="searchId==='1' && !initVisible" class="list-content">
+        <div v-if="searchId==='1'" class="list-content">
             <p class="font16 color333 t-l">相关课程</p>
-            <class-list :list="listResult" :onChange="getClassData"/>
+            <class-list :list="listResult" :onChange="getClassData" :loading="loadMore"/>
         </div>
         <!-- 相关课程 -->
         <!-- 相关老师 -->
          <div v-if="searchId==='2'" class="list-content">
             <p class="font16 color333 t-l">相关老师</p>
-            <teacher-list :list="listResult" :onChange="getClassData"/>
+            <teacher-list :list="listResult" :onChange="getClassData" :loading="loadMore"/>
          </div>
         <!-- 相关老师 -->
         <!-- 相关书籍 -->
         <div v-if="searchId==='3'" class="list-content">
             <p class="font16 color333 t-l">相关书籍</p>
-            <book-list :list="listResult" :onChange="getClassData"/>
-         </div>
+            <book-list :list="listResult" :onChange="getClassData" :loading="loadMore"/>
+        </div>
+        <p style="padding:2.7vw 0;"  v-if="loadMore && searchId" class="content-footer color999 font12">这里是底线~</p>
         <!-- 相关书籍 -->
         <!-- 无数据页面 -->
         <div v-if="searchId==='4'">
@@ -45,9 +46,9 @@
         <!-- 无数据页面 -->
         <!-- <mt-spinner type="fading-circle"></mt-spinner> -->
     </div>
-    <div v-else class="no-data f-c-c">
+    <div v-if="!hasData" class="no-data f-c-c">
         <img src="../../assets/img/sousuokongzhuangtai@2x (2).png"/>
-        <span class="font14 color999">共搜到0个课程</span>
+        <span class="font14 color999">共搜到0个{{searchSelect}}</span>
     </div>
   </div>
 </template>
@@ -86,13 +87,17 @@ export default {
         listResult:[],// 搜索结果数据
         initVisible:true, // 初始化
         page:1,
-        hasData:true
+        hasData:true,
+        loadMore:true,
     }
   },
+  created(){
+    //  this.getData('')
+  },
   mounted(){
-     if(JSON.parse(localStorage.getItem('searchList'))){
-         this.searchData = JSON.parse(localStorage.getItem('searchList'))
-     }
+    //  if(JSON.parse(localStorage.getItem('searchList'))){
+    //      this.searchData = JSON.parse(localStorage.getItem('searchList'))
+    //  }
       Common.InitImg()
   },
   methods:{
@@ -101,46 +106,37 @@ export default {
         let data = new FormData();
         data.append('page',this.page)
         data.append('keyword',val)
+        let url = "/course/list"
         if(this.searchId == '1'){
-            this.ajax({
-                url: "/course/list",
+            url="/course/list"
+        }else if(this.searchId == '2'){
+            url="/teacher/list"
+        }else if(this.searchId == '3'){
+            url="/goods/list" 
+        }
+          this.ajax({
+                url: url,
                 type:'post',
                 data,
                 success(data) {
+                     
                     if(data.data.length!=0){
-                        _this.listResult = data.data;
                         _this.hasData = true
+                        if(data.data.length == 10){
+                            _this.loadMore = false
+                        } 
+                        _this.listResult = data.data;
                     }else{
                         _this.hasData = false
-                    }
-                    
+                    }                   
                 }
-            }) 
-        }else if(this.searchId == '2'){
-            this.ajax({
-                url: "/teacher/list",
-                type:'post',
-                data,
-                success(data) {
-                    _this.listResult = data.data;
-                }
-            }) 
-        }else if(this.searchId == '3'){
-            this.ajax({
-                url: "/course/list",
-                type:'post',
-                data,
-                success(data) {
-                    _this.listResult = data.data;
-                }
-            }) 
-        }
+            })
   
       },
       onSearch(){
-          if(this.searchVal == ''){
-              return
-          }
+        //   if(this.searchVal == ''){
+        //       return
+        //   }
           this.initVisible = false
           let searchlist = JSON.parse(localStorage.getItem('searchList'))
           if(searchlist){
@@ -163,6 +159,7 @@ export default {
       },
       onSelect(e,item){
           const _this = this;
+          this.page = 1;
           e = e || window.event;
           e.stopPropagation();
           for(var i in this.searchType){
@@ -173,11 +170,44 @@ export default {
           this.searchSelect = item.name;
           this.searchId = item.id;
           this.initVisible = false
-          this.getData(this.searchVal)
+          this.listResult=[]
+        //   this.getData(this.searchVal)
       },
       getClassData(){
-        //   this.listResult.push( {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'})
-      }
+            if(this.loadMore){
+                return
+            }
+            this.page++
+            const _this = this;
+            let data = new FormData();
+            data.append('page',this.page)
+            data.append('keyword',this.searchVal)
+            this.loadMore = true
+            let url = "/course/list"
+            if(this.searchId == '1'){
+                url="/course/list"
+            }else if(this.searchId == '2'){
+                url="/teacher/list"
+            }else if(this.searchId == '3'){
+                url="/goods/list" 
+            }
+            this.ajax({
+                url: url,
+                type:'post',
+                data,
+                success(data) {
+                    if(data.data.length == 0){
+                        _this.loadMore = true
+                        return
+                    }
+                    _this.loadMore = false
+                    data = data.data;
+                    data.forEach(item=>{
+                        _this.classData.push(item)
+                    })
+                }
+            })
+       }
   }
 }
 </script>
@@ -187,7 +217,7 @@ export default {
     .search{
         width:100%;
         min-height:100%;
-        background:#fff;
+        background:#f5f5f5;
         header{
             padding:2.7vw 5.4vw;
             background:#f5f5f5;
@@ -201,7 +231,7 @@ export default {
                 border-radius: 4.6vw;
                 .select{
                     position: relative;
-                    padding: 0 2.2vw;
+                    padding: 0 1.5vw;
                     .search-type{
                         position: absolute;
                         width:14.4vw;
@@ -239,9 +269,12 @@ export default {
                     height:5.4vw;
                     width:1px;
                     background:#ccc;
-                    margin:1.85vw 2.7vw 0 2.2vw;
+                    margin:1.85vw 1vw 0 1vw;
                 }
                 .s-input{
+                    .icon-sousuo{
+                        margin-right:1.5vw;
+                    }
                     input{
                         background:transparent;
                         outline: none;
@@ -257,19 +290,23 @@ export default {
             }
         }
         .content{
-            padding:0 2.7vw;
-            padding-top:3.2vw;
             .list-content{
                 p{
-                    margin-left:2.7vw;
+                    padding-left:2.7vw;
+                    padding-top:3.2vw;
+                    background:#fff;
                 }
             }
         }
         .no-data{
+            width:100%;
+            height:100%;
+            position: fixed;
+            background:#fff;
             img{
                 margin:0 auto;
                 width:37.4vw;
-                margin-top:34.7vw;
+                margin-top:-34.7vw;
                 margin-bottom:6vw;
             }
         }

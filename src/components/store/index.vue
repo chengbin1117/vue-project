@@ -3,7 +3,7 @@
         <!-- 轮播图 -->
         <mt-swipe class="swiper" :auto="4000">
             <mt-swipe-item v-for="(item,index) in swiper" :key="index">
-                <img class="pic-c-c" v-lazy="item.image" :data="item.image"/>
+                <img @click="toOther(item)" class="pic-c-c" v-lazy="item.image" :data="item.image"/>
             </mt-swipe-item>
         </mt-swipe>
         <!-- 轮播图 -->
@@ -11,12 +11,13 @@
             <span @click="navChange(item)" :class="item.class" v-for="(item,index) in navData" :key="index">{{item.title}}</span>
         </div>
         <div class="store-content">
-            <store-list v-if="storeList.length!=0" :list="storeList"  :onChange="getStoreList" />
+            <store-list v-if="storeList.length!=0" :list="storeList"  :onChange="getStoreList" :loading="loadMore"/>
             <div v-else class="no-data f-c">
                 <img src="../../assets/img/meiyoushangpin@2x.png" />
                 <span class="font14 color999">暂无相关商品哦~</span>
             </div>
         </div>
+        <p style="padding:2.7vw 0;"  v-if="loadMore" class="content-footer color999 font12">这里是底线~</p>
         <Footer />
   </div>
 </template>
@@ -43,6 +44,7 @@ export default {
         activeNav:'all',
         storeList:[], // 相关课程数据
         page:1,
+        loadMore:false,
     }
   },
   created(){
@@ -80,6 +82,11 @@ export default {
      Common.InitImg()
   },
   methods:{
+    toOther(item){
+      if(item.url){
+        window.location.href=item.url
+      }
+    },
     getData(){
         const _this = this
         // 商品列表
@@ -92,12 +99,16 @@ export default {
             type:'post',
             data,
             success(data) {
+                if(data.data.length < 10){
+                    _this.loadMore = true
+                }
                 _this.storeList = data.data
             }
         })    
     },
     navChange(item){
           this.activeNav = item.id;
+          this.page = 1;
           for(var i in this.navData){
               this.navData[i].class = 'font16 color333';
               item.class = 'font16 color333 active'
@@ -105,7 +116,32 @@ export default {
           this.getData()
     },
     getStoreList(){
-        // this.storeList.push( {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'})
+      if(this.loadMore){
+            return
+        }
+        this.page++
+        const _this = this;
+        let data = new FormData();
+        data.append('goods_type',1)
+        data.append('page',this.page)
+        data.append('cat_id',this.activeNav)
+        this.loadMore = true
+        this.ajax({
+            url: "/goods/list",
+            type:'post',
+            data,
+            success(data) {
+                if(data.data.length == 0){
+                    _this.loadMore = true
+                    return
+                }
+                _this.loadMore = false
+                data = data.data;
+                data.forEach(item=>{
+                    _this.storeList.push(item)
+                })
+            }
+        })
     },
   }
 }
@@ -116,7 +152,8 @@ export default {
     .store{
         width:100%;
         background:#f5f5f5;
-        height:100%;
+        min-height:100%;
+        padding-bottom: 13.2vw;
         .no-data{
             position: fixed;
             width: 100%;
@@ -133,10 +170,10 @@ export default {
         .swiper{
             position: relative;
             width:100%;
-            height:56vw;
+            height:45.1vw;
             margin-bottom:2.7vw;
             .pic-c-c{
-            width:100%;
+                width:100%;
             }
         }
         .store-nav{
@@ -144,7 +181,7 @@ export default {
             overflow: scroll;
             height: 12vw;
             line-height: 12vw;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #ddd;
             background: #fff;
             display: -webkit-box;
             overflow-y: hidden;
@@ -166,7 +203,7 @@ export default {
         .store-content{
             background:#fff;
             padding:0 2.7vw;
-            padding-bottom:14vw;
+            padding-bottom: 5vw;
         }
     }
 </style>

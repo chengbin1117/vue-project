@@ -2,7 +2,9 @@
   <div  class="about-us">
       <div class="bg"></div>
       <div class="info f-c-c">
-          <div class="logo">LOGO</div>
+          <div class="logo">
+            <img class="pic-c-c" :src="data.logo"/>
+          </div>
           <p class="tit font18 color333">{{data.title}}</p>
           <p class="font14 color999">V1.0</p>
       </div>
@@ -71,11 +73,9 @@ export default {
             .logo{
                 width:26.7vw;
                 height:26.7vw;
-                line-height: 26.7vw;
                 border-radius: 50%;
-                background:#eb4c49;
-                color:#fff;
-                font-size:7.5vw;
+                overflow: hidden;
+                position: relative;
                 margin:0 auto;
             }
             .tit{

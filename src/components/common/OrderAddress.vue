@@ -1,10 +1,11 @@
 <template>
   <div   @click="toAddress" :class="['order-address','f-r-c',hideShadow ? 'hide-shadow' : '']">   
     <div class="f-c-c"><i class="sign iconfont icon-weizhi1"></i></div>
-    <p class="address-detail t-l f-c-c">
+    <p v-if="data" class="address-detail t-l f-c-c">
         <span class="font16 color333">{{data.user_name}}</span>
         <span class="font14 color333 omit1">{{data.province}}{{data.city}}{{data.address}}</span>
     </p>
+    <p v-else class="f-c-c address-detail t-l">请选择收货地址</p>
     <div v-if="!hideShadow" class="f-c-c"><i class="corner iconfont icon-fanhui-copy"></i></div>
   </div>
 </template>
@@ -37,6 +38,7 @@ export default {
   methods:{
       toAddress(){
           if(!this.hideShadow){
+            localStorage.setItem('lastPath',this.$route.path)
             this.$router.push('/my-address/' + this.$route.params.id)
           }
       }

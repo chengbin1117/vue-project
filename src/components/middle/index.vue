@@ -30,7 +30,8 @@
     </div>
     <div v-if="hasData" class="content">
         <div v-if="isExtend[typeIndex].isShow" class="mask"></div>
-        <class-list :list="classData" :onChange="getClassData"/>
+        <class-list :list="classData" :onChange="getClassData" :loading="loadMore"/>
+        <p style="padding:2.7vw 0;" v-if="loadMore" class="content-footer color999 font12">这里是底线~</p>
     </div>
     <div v-else class="no-data f-c">
         <img src="../../assets/img/meiyoukecheng@2x.png" />
@@ -76,8 +77,8 @@ export default {
             {name:'音频课',id:'3',class:'child font14 color333 text-l'}
         ], // 分类类型
         gradeChildSelect:'0', // 年级子级被选中项
-        subjectSelect:'0', // 学科被选中项
-        otherSelect:'10', // 分类被选中项
+        subjectSelect:'全部', // 学科被选中项
+        otherSelect:'0', // 分类被选中项
         page:1,// 页码
         classData:[], // 相关课程数据
         typeIndex:0,// 分类索引
@@ -86,7 +87,8 @@ export default {
             {isShow:false},
             {isShow:false}
         ], // 是否展开
-        hasData:false
+        hasData:false,
+        loadMore:false,
     }
   },
   created(){
@@ -95,6 +97,7 @@ export default {
     let subjectdata = new FormData()
     let otherdata = new FormData()
     gradedata.append('type','2')
+    gradedata.append('is_all','1')
     subjectdata.append('token',localStorage.getItem('qtoken'))
     subjectdata.append('type','2')
     otherdata.append('token',localStorage.getItem('qtoken'))
@@ -147,8 +150,9 @@ export default {
         let data = new FormData();
         data.append('page',this.page)
         data.append('grade',this.gradeChildSelect)
-        data.append('subject',this.subjectSelect)
+        data.append('subject',this.subjectSelect == '全部' ? '0' : this.subjectSelect)
         data.append('course_type',this.otherSelect)
+        data.append('rank','2')
         this.ajax({
             url: "/course/list",
             type:'post',
@@ -158,13 +162,43 @@ export default {
                     _this.hasData = false
                     return
                 }
+                if(data.data.length < 10){
+                    _this.loadMore = true
+                }
                 _this.hasData = true
                _this.classData = data.data;
             }
         })
     },
     getClassData(){
-        //   this.classData.push( {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'})
+        if(this.loadMore){
+            return
+        }
+        this.page++
+        const _this = this;
+          let data = new FormData();
+        data.append('page',this.page)
+        data.append('grade',this.gradeChildSelect)
+        data.append('subject',this.subjectSelect == '全部' ? '0' : this.subjectSelect)
+        data.append('course_type',this.otherSelect)
+        data.append('rank','2')
+        this.loadMore = true
+        this.ajax({
+            url: "/course/list",
+            type:'post',
+            data,
+            success(data) {
+                if(data.data.length == 0){
+                    _this.loadMore = true
+                    return
+                }
+                _this.loadMore = false
+                data = data.data;
+                data.forEach(item=>{
+                    _this.classData.push(item)
+                })
+            }
+        })
     },
     // 展开分类
     unfold(item,index){
@@ -181,7 +215,7 @@ export default {
             }
         })
         this.subjectList.forEach(item =>{
-            if(item.id == _this.subjectSelect){
+            if(item.title == _this.subjectSelect){
                 item.class = 'font14 color333 active text-l'
             }
         })
@@ -208,16 +242,21 @@ export default {
         this.type = '3';
         if(type === 'grade'){
             this.gradeChildSelect = item.grade
+            this.classType[0].name = item.name
         }else if(type === 'subject'){
-            this.subjectSelect = item.id
+            this.subjectSelect = item.title
+            this.classType[1].name = item.title
         }else{
             this.otherSelect = item.type
+            this.classType[2].name = item.name
         }
         for(var i in this.classType){
             this.classType[i].isDown = true
         }
         this.isExtend[this.typeIndex].isShow = false;
+        this.page = 1;
         this.getData()
+         document.getElementsByTagName('body')[0].style.overflow = 'auto'
     },
     resetClass(item,name){
         for(var i = 0,l = item.length;i < l;i++){
@@ -234,7 +273,7 @@ export default {
         width:100%;
         background:#f5f5f5;
         padding-top:2.7vw;
-        height:100%;
+        min-height:100%;
         .no-data{
             position: fixed;
             width: 100%;
@@ -252,7 +291,7 @@ export default {
             height:12vw;
             line-height: 12vw;
             background:#fff;
-            border-bottom:1px solid #ccc;
+            border-bottom:1px solid #ddd;
             .class-type{
                 position: relative;
                 width:33%;

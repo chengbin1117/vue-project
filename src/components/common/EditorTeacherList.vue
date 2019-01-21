@@ -16,7 +16,7 @@
        <div class="r">
            <p class="name omit1 font16 color333">{{item.real_name}}</p>
            <p class="tit omit1 font14 color666">{{item.good_at}}</p>
-           <p class="b font14 color333">
+           <p class="omit1 b font14 color333">
                <span class="type">{{item.subject}}</span>
                <span class="line">|</span>
                <span class="class">{{item.grade}}</span>
@@ -56,7 +56,7 @@ export default {
     },
     toTeacher(item){
         console.log(item.id)
-        this.$router.push('teacher-detail/' +2)
+        this.$router.push('teacher-detail/' +item.id)
     },
     handleChecked(item){
         item.checked = !item.checked
@@ -73,6 +73,7 @@ export default {
         padding:0px 2.7vw;
         .list{
             padding:5.4vw 0;
+            padding-bottom:0;
             .check{
                 position: relative;
                 width:5.4vw;
@@ -94,9 +95,9 @@ export default {
                 }
                 i{
                     z-index:100;
-                    width:5.4vw;
-                    height:5.4vw;
-                    font-size:5.4vw;
+                    width:6.4vw;
+                    height:6.4vw;
+                    font-size:6.4vw;
                 }
             }
         }
@@ -122,6 +123,12 @@ export default {
             .b{
                 .line{
                     margin:0px 2.7vw;
+                }
+            }
+            .omit1{
+                height:4.3vw;
+                .class{
+                    line-height:4.8vw;
                 }
             }
         }

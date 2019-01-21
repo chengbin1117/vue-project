@@ -7,6 +7,7 @@
         class="list f-r-sb" 
         v-for="(item,index) in list" 
         :key="index"
+        @click="toDetail(item)"
     >  
         <div class="f-r">
             <div class="check" v-if="editor">
@@ -15,9 +16,9 @@
                 <i v-else class="iconfont icon-select color999"></i>
             </div>
             <div class="avatar">
-                <p @click="toDetail(item)">
-                        <img class="pic-c-c" v-lazy="item.course_cover" :data="item.course_cover"/>
-                        <span class="type font10">{{item.subject}}</span>
+                <p >
+                    <img class="pic-c-c" v-lazy="item.course_cover" :data="item.course_cover"/>
+                    <span class="type font10">{{item.course_type == 10 ? '音频课':'录播课'}}</span>
                 </p>
             </div>
         </div>
@@ -26,12 +27,12 @@
            <p class="b font14 color333">
                <span class="type">{{item.subject}}</span>
                <span class="line">|</span>
-               <span class="class font12">{{item.grade}}</span>
+               <span class="class font12">{{item.course_num}}节课</span>
            </p>
            <p class="f-r-sb">
-               <span class="colorfree font12">{{item.classType}}</span>
-               <span v-if="false" class="colorbuy font12">{{item.classType}}</span>
-               <span v-if="false" class="colorlimt font12">{{item.classType}}</span>
+               <span v-if="item.charge_type==10" class="colorfree font14">免费</span>
+               <span v-if="item.charge_type == 20 && !item.time_limit" class="colorbuy font14"> ￥{{item.price}}</span>
+               <span v-if="item.charge_type == 20 && item.time_limit" class="colorlimit font14">限时观看</span>
                <span class="font12 color999">{{item.sales_num}}人报名</span>
            </p>
        </div>
@@ -48,11 +49,15 @@ export default {
     editor: {
         type: [Boolean],
         default: false,
-    }
+    },
+    loading: {
+        type: [Boolean],
+        default: false,
+    },
   },
   data () {
     return {
-        loading:false,
+       
     }
   },
   mounted(){
@@ -61,17 +66,13 @@ export default {
   methods:{
     loadMore() {
         const that = this;
-        this.loading = true;
-        setTimeout(() => {
-            that.onChange()
-            that.loading = false;
-        }, 1000);
+        that.onChange()
     },
     toDetail(item){
         if(item.course_type == 10){
-            this.$router.push('audio-detail/' + item.id +'/0')
+            this.$router.push('/audio-detail/' + item.id +'/0')
         }else{
-            this.$router.push('video-detail/' + item.id + '/0')
+            this.$router.push('/video-detail/' + item.id + '/0')
         } 
     }
   }
@@ -86,6 +87,7 @@ export default {
         padding:0px 2.7vw;
         .list{
             padding:5.4vw 0;
+            padding-bottom:0vw;
              .check{
                 position: relative;
                 width:5.4vw;

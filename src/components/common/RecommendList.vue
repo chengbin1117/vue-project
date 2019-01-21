@@ -1,13 +1,13 @@
 <template>
   <div class="recommend-lists">
-    <div class="list f-r-sb" v-for="(item,index) in list" :key="index">
-       <div @click="toTeacher(item)" class="avatar">
-           <img class="pic-c-c" v-lazy="item.img_path" :data="item.img_path"/>
+    <div @click="toTeacher(item)" class="list f-r-sb" v-for="(item,index) in list" :key="index">
+       <div  class="avatar">
+           <img class="pic-c-c" :src="item.img_path" :data="item.img_path"/>
        </div>
        <div class="r">
            <p class="name omit1 font16 color333">{{item.real_name}}</p>
-           <p class="tit omit1 font14 color666">{{item.good_at}}</p>
-           <p class="b font14 color333">
+           <p class="tit omit1 font14 color666">擅长{{item.good_at}}</p>
+           <p class="omit1 b font14 color333">
                <span class="type">{{item.subject}}</span>
                <span class="line">|</span>
                <span class="class">{{item.grade}}</span>
@@ -47,14 +47,20 @@ export default {
         padding:0px 2.7vw;
         .list{
             padding:5.4vw 0;
+            padding-bottom:0vw;
         }
         .avatar{
             position: relative;
             width:18.7vw;
             height:18.7vw;
-            overflow: hidden;
             border-radius: 50%;
             margin-right:4vw;
+            // overflow: hidden;
+            img{
+                width:100%;
+                height:100%;
+                border-radius: 50%;
+            }
         }
         .r{
             flex:1;
@@ -70,6 +76,12 @@ export default {
             .b{
                 .line{
                     margin:0px 2.7vw;
+                }
+            }
+            .omit1{
+                height:4.3vw;
+                .class{
+                    line-height:4.8vw;
                 }
             }
         }

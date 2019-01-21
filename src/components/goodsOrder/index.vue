@@ -56,23 +56,25 @@
         <div class="footer-pay f-r-c">
             <span class="font14 color333">实付：</span>
             <p class="f-c-c total">
-                <span class="font18 colorbuy">￥{{data.total}}</span>
-                <span class="font12 color999">含运费￥{{data.freight}}</span>
+                <span class="font18 colorbuy t-l">￥{{data.total}}</span>
+                <span class="font12 color999 t-l">( 含运费￥{{data.freight}} )</span>
             </p>
         </div>
         <div @click="confirm" class="confirm font18 colorfff t-c">确认支付</div>
     </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
 import OrderAddress from "@/components/common/OrderAddress";
+import MsgBox from '@/components/common/MsgBox'
 
 // 实物订单页面
 export default {
   name: 'GoodsOrder',
   components:{
-      OrderAddress
+      OrderAddress,MsgBox
   },
   watch:{
 
@@ -90,7 +92,9 @@ export default {
             shop_price:'',
             total:''
         },
-        data2:{}
+        data2:{},
+        msgVisible:false,
+        msg:''
     }
   },
   created(){
@@ -110,7 +114,8 @@ export default {
             const data1 = data.data
             const data2 = data.data2
             _this.data = data1
-            _this.data.total = _this.goodsNum * parseInt(data1.shop_price) - parseInt(data1.freight)
+            _this.data.freight =  parseInt(_this.data.freight).toFixed(2)
+            _this.data.total = (_this.goodsNum * parseInt(data1.shop_price) + parseInt(data1.freight)).toFixed(2)
             _this.data2 = data2.addr ? data2.addr : null
         }
     })
@@ -126,6 +131,14 @@ export default {
         const _this = this;
         this.id = this.$route.params.id;
         let data = new FormData();
+        if(!this.data2){
+            this.msgVisible = true
+            _this.msg = '请先选择地址'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+            return
+        }
         data.append('token',localStorage.getItem('qtoken'))
         data.append('id',this.id)
         data.append('num',this.goodsNum)
@@ -140,7 +153,7 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.$router.push('/pay-success/' + _this.$route.params.id)
+                    _this.$router.push('/pay-success/' + data.data +'/2')
                 }
             }
         })
@@ -152,11 +165,20 @@ export default {
           }else{
               this.goodsNum --
           }
-           this.data.total = this.goodsNum * parseInt( this.data.shop_price) - parseInt(this.data.freight)
+           this.data.total = (this.goodsNum * parseInt( this.data.shop_price) + parseInt(this.data.freight)).toFixed(2)
       },
       addNum(){
+          const _this = this
+          if(this.goodsNum >= this.data.stock){
+            this.msgVisible = true
+            _this.msg = '库存不足'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+            return
+          }
           this.goodsNum ++
-          this.data.total = this.goodsNum * parseInt( this.data.shop_price) - parseInt(this.data.freight)
+          this.data.total = (this.goodsNum * parseInt( this.data.shop_price) + parseInt(this.data.freight)).toFixed(2)
       }
       
   }
@@ -168,9 +190,10 @@ export default {
     .goods-order{
         width:100%;
         background:#f5f5f5;
-        height:100%;    
+        min-height:100%;    
         padding-top:2.7vw;
         // padding:0 2.7vw;
+        padding-bottom:15vw;
         .address{
             margin-bottom:2.7vw;
         }
@@ -257,10 +280,15 @@ export default {
             }
         }
         .warning{
-            font-size:3.2px;
             color:#fa8f44;
             text-align: left;
             padding-left:4.3vw;
+            i{
+                font-size:3.2vw;
+            }
+            span{
+                font-size:3.2vw;
+            }
         }
         .order-footer{
             width:100%;

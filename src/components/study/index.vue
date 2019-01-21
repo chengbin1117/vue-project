@@ -41,26 +41,39 @@ export default {
       Footer, StudyList
   },
   watch:{
-
+      studylist(){
+           Common.InitImg()
+      }
   },
   data () {
     return {
-        studylist:[  
-          {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'一年级、二年级、三年级'},
-          {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'一年级、二年级、三年级'},
-          {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'一年级、二年级、三年级'},
-          {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'一年级、二年级、三年级'},
-          {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'一年级、二年级、三年级'},
-          {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'一年级、二年级、三年级'},
-      ],
+      studylist:[],
       hasData:false,
       select:0,
     }
   },
   created(){
-    this.getData()
+
   },
   mounted(){
+          const id = this.$route.params.id;
+    if(id == '-1'){
+        let tabs = document.getElementsByClassName('tab-item');
+        for(var i=0,l=tabs.length;i<l;i++){
+            tabs[i].className = 'tab-item font12 color999'
+        }
+        tabs[1].className = 'tab-item font12 color999 active'
+        this.select = 1
+        this.getData()
+        const footer = document.getElementsByClassName('footer')[0];
+        const _a = footer.childNodes
+        _a.forEach(element => {
+            element.className = ''
+        });
+        _a[1].className = 'router-link-exact-active router-link-active'
+    }else{
+        this.getData()
+    }
     Common.InitImg()
   },
   methods:{
@@ -115,7 +128,7 @@ export default {
             border-radius: 1.6vw;
             margin-top:2.7vw;
             background:#fff;
-            box-shadow: 0px 3px 3px rgba(0,0,0,0.3);
+            box-shadow: 0px 3px 3px rgba(0,0,0,0.1);
             .item{
                 width:49%;
                 i{
@@ -150,7 +163,7 @@ export default {
                     display: inline-block;
                     width:2px;
                     height:4.8vw;
-                    background:#999;
+                    background:#ccc;
                     margin:0 1.4vw;
                 }
                 .active{

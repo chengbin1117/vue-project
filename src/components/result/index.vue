@@ -5,7 +5,7 @@
           <div class="start">
               <i v-for="(item,index) in start" :key="index" :class="[item.class,item.isred ? 'active' : '']"></i>
           </div>
-          <p v-if="true" class="warning font14 color333">恭喜首次答题完成获得{{result.integral}}积分</p>
+          <p v-if="isFirst" class="warning font14 color333">恭喜首次答题完成获得{{result.integral}}积分</p>
           <p v-else class="warning font14 color333">很棒哦，继续加油~</p>
           <div class="info f-r-c">
               <p>
@@ -39,8 +39,8 @@
           <p class="warning font12 color999">注：每套练习题根据首次练习成绩获得相应积分，之后的重复练习成绩不得积分。</p>
       </div>
       <div class="handel">
-          <router-link to="exercises">再刷一遍</router-link>
-          <router-link to="/">返回课程</router-link>
+          <router-link :to="'/exercises/'+ id +'/' +course_id">再刷一遍</router-link>
+          <router-link :to="goback">返回课程</router-link>
       </div>
   </div>
 </template>
@@ -65,13 +65,18 @@ export default {
         data:[],
         result:{},// 答题结果
         token:null,
+        id:'',
+        course_id:'',
+        isFirst:true,
+        goback:'',
     }
   },
   created(){
+        this.goback = localStorage.getItem('classPath');
         const _this = this;
         this.token = localStorage.getItem('qtoken')
         let answerdata = new FormData();
-        answerdata.append('catalog_id','36')
+        answerdata.append('catalog_id',this.$route.params.id)
         answerdata.append('token',this.token)
         this.ajax({
             url: "/user/answer-result",
@@ -80,6 +85,7 @@ export default {
             success(data) {
                 _this.result = data.data
                 _this.data = data.data.result
+                _this.isFirst = parseInt(_this.result.count) > 1 ? false : true
                 _this.start.forEach((item,index) => {
                     if(index < data.data.star){
                         item.isred = true
@@ -89,6 +95,8 @@ export default {
                 })
             }
         })
+        this.id = this.$route.params.id
+        this.course_id = this.$route.params.course_id
   },
   mounted(){
      Common.InitImg()

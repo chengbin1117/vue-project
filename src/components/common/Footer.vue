@@ -13,16 +13,19 @@ export default {
   data () {
     return {
         data:[
-          {class:'icon iconfont icon-shouye1',name:'首页',link:'/'},
-          {class:'icon iconfont icon-xuexi',name:'学习',link:'/study'},
-          {class:'icon iconfont icon-shangcheng2',name:'商城',link:'/store'},
-          {class:'icon iconfont icon-xiaoxi2',name:'消息',link:'/msg'},
-          {class:'icon iconfont icon-zhanghao',name:'我的',link:'/mine'},
+          {class:'icon iconfont icon-shouye1-copy',name:'首页',link:'/'},
+          {class:'icon iconfont icon-xuexi-copy',name:'学习',link:'/study/0'},
+          {class:'icon iconfont icon-shangcheng2-copy',name:'商城',link:'/store'},
+          {class:'icon iconfont icon-xiaoxi2-copy-copy',name:'消息',link:'/msg'},
+          {class:'icon iconfont icon-zhanghao-copy',name:'我的',link:'/mine'},
         ]
     }
   },
   mounted(){
-     
+    if(this.$route.query.token){
+      let _a = document.getElementsByClassName('footer')[0].firstChild;
+      _a.style.color = '#EB4C49'
+    } 
   }
 }
 </script>
@@ -38,7 +41,7 @@ export default {
         background:#fff;
         z-index:600;
         display: flex;
-        border-top:1px solid #ccc;
+        border-top:1px solid #ddd;
         a{
           width:20%;
           height:100%;

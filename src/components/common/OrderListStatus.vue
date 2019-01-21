@@ -10,15 +10,15 @@
     >  
        <div class="order-num f-r-sb">
            <span class="font14 color333">订单编码：{{item.order_sn}}</span>
-           <span v-if="item.status == 0" class="font14 colors">待付款</span>
-           <span v-if="item.status == 10" class="font14 colorlimit">待发货</span>
-           <span v-if="item.status == 20" class="font14 colorblue">待收货</span>
-           <span v-if="item.status == 40" class="font14 color333">已完成</span>
+           <span v-if="item.status == 0" class="font14 colors">{{item.status_desc}}</span>
+           <span v-if="item.status == 10" class="font14 colorlimit">{{item.status_desc}}</span>
+           <span v-if="item.status == 20" class="font14 colorblue">{{item.status_desc}}</span>
+           <span v-if="item.status == 40" class="font14 color333">{{item.status_desc}}</span>
        </div>
        <div @click="toDetail(item)" class="order-detail f-r">
            <div class="pic">
-                <img class="pic-c-c" :data="item.image" v-lazy="item.image"/>
-                <span v-if="isVirtual" class="type font10">录播课</span>
+                <img class="pic-c-c" :data="item.image" :src="item.image"/>
+                <span v-if="isVirtual" class="type font10">{{item.course_type == 10 ? '音频课':'录播课'}}</span>
            </div>
            <div class="info f-c-c">
                <p class="font16 color333 omit1">{{item.goods_name}}</p>
@@ -28,7 +28,7 @@
                </p>
            </div>
        </div>
-       <p class="order-price font14 color333 f-r-end">实付：<span class="font18 colorbuy">￥{{item.price_pay}}</span><span v-if="!isVirtual">(含运费￥{{item.price_freight}})</span></p>
+       <p class="order-price font14 color333 f-r-end">实付：<span class="font18 colorbuy">￥{{item.price_all}}</span><span v-if="!isVirtual">(含运费￥{{item.price_freight}})</span></p>
        <div v-if="item.status == 0" class="order-pay f-r-end">
            <span class="pay">立刻支付</span>
        </div>

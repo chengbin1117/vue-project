@@ -8,19 +8,28 @@
         </mt-radio>
     </div>
     <textarea class="desc" rows="5" cols="5" v-model="desc" placeholder="请输入反馈内容"></textarea>
-    <mt-button @click="submit" class="btn-submit">提交</mt-button>
+    <mt-button @click="submit" :disabled="disabled" class="btn-submit">提交</mt-button>
+    <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
+import MsgBox from '@/components/common/MsgBox'
 
 // 问题反馈页面
 export default {
   name: 'FeedBack',
   components:{
+      MsgBox
   },
   watch:{
-
+      desc(newVal,oldVal){
+          if(this.desc!=''){
+              this.disabled = false
+          }else{
+              this.disabled = true
+          }
+      }
   },
   data () {
     return {
@@ -43,7 +52,10 @@ export default {
             }
         ],
         value:'10',
-        desc:''
+        desc:'',
+        disabled:true,
+        msgVisible:false,
+        msg:''
     }
   },
   mounted(){
@@ -51,6 +63,7 @@ export default {
   },
   methods:{
     submit(){
+        const _this = this
         let data = new FormData();
         data.append('token',localStorage.getItem('qtoken'))
         data.append('type',this.value)
@@ -60,6 +73,11 @@ export default {
             type:'post',
             data,
             success(data) {
+                _this.msgVisible = true
+                _this.msg = data.msg
+                setTimeout(function(){
+                    _this.msgVisible = false
+                },1000)
             }
         }) 
     }
@@ -92,7 +110,7 @@ export default {
             padding:4vw 2.7vw;
         }
         .btn-submit{
-            margin-top:13.4vw;
+            margin-top:30vw;
         }
         input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
             color: #999;

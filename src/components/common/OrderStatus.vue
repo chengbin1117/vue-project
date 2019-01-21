@@ -5,7 +5,7 @@
         <span  v-if="data.status == 10"   class="font16 color333 t-l">待发货</span>
         <span v-if="data.status == 20" class="font16 color333 t-l">待收货</span>
         <span v-if="data.status == 40" class="font16 color333 t-l">已完成</span>
-        <span v-if="true" class="font14 color666 t-l mart10">还剩15分钟订单关闭</span>
+        <span v-if="data.status == 0" class="font14 color666 t-l mart10">{{data.order_auto_end > 0 ? '还剩'+data.order_auto_end+'分钟订单关闭' :'订单已关闭'}} </span>
         <p v-if="data.status == 20" class="font14 color666 t-l mart10">
             <span class="marr10">{{data.express}}</span>
             <span>{{data.express_sn}}</span>
@@ -13,10 +13,10 @@
     </div>
     <div class="f-c-c">
         <!-- 待付款 -->
-        <img src="../../assets/img/daifukuan@2x.png"/>
-        <img v-if="false" src="../../assets/img/daifahuo@2x.png"/>
-        <img v-if="false" src="../../assets/img/daishouhuo@2x.png"/>
-        <img v-if="false" src="../../assets/img/yiwancheng@2x.png"/>
+        <img v-if="data.status == 0" src="../../assets/img/daifukuan@2x.png"/>
+        <img v-if="data.status == 10"  src="../../assets/img/daifahuo@2x.png"/>
+        <img v-if="data.status == 20" src="../../assets/img/daishouhuo@2x.png"/>
+        <img v-if="data.status == 40" src="../../assets/img/yiwancheng@2x.png"/>
         <!-- 待付款 -->
     </div>
   </div>

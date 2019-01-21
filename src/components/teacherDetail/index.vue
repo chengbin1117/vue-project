@@ -52,7 +52,7 @@
             <i class="red-line"></i>
             <span>教师介绍</span>
         </p>
-        <p class="des" v-html="detail.introduction"></p>
+        <p class="des teacher-detail-des" v-html="detail.introduction"></p>
     </div>
     <!-- 名师简介 -->
   </div>
@@ -273,7 +273,19 @@ export default {
             }
             .des{
                 text-indent: 5.4vw;
+                img{
+                    display:inline-block;
+                    width:26.7vw;
+                }
             }
+        }
+    }
+</style>
+<style lang="less">
+    .teacher-detail-des{
+        img{
+            display:block;
+            width:26.7vw;
         }
     }
 </style>

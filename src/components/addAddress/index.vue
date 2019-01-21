@@ -30,7 +30,21 @@ export default {
       MsgBox
   },
   watch:{
-
+    'form.name'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.phone'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.address'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.city'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.province'(newVal,oldVal){
+       this.disabledChange()
+    },
   },
   data () {
     return {
@@ -62,8 +76,8 @@ export default {
         province:'',
         city:'',
         pickerVisible:false,
-        disabled:false,
-        msgVisible:false
+        disabled:true,
+        msgVisible:false,
     }
   },
   mounted(){
@@ -74,6 +88,13 @@ export default {
      }
   },
   methods:{
+      disabledChange(){
+          if(this.form.name!='' &&this.form.phone!='' && this.form.address!=''&& this.form.city!=''&&this.form.province!=''){
+              this.disabled = false
+          }else{
+            this.disabled = true
+          }
+      },
      submit(){
         const _this = this;
         // 新增address-add
@@ -95,9 +116,9 @@ export default {
                 setTimeout(function(){
                     _this.msgVisible = false
                     if(data.code == 0){
-                         _this.$router.push('my-address/-1')
+                         _this.$router.push('/my-address/' +_this.$route.params.id)
                     }
-                },2000)
+                },1000)
             }
         })
      },
@@ -171,6 +192,7 @@ export default {
             }
             .placeholder{
                 color:#999;
+                font-size:3.8vw
             }
         }
         .address-picker{
@@ -184,8 +206,8 @@ export default {
                 text-align: right;
                 padding-right: 2.7vw;
                 font-size: 4.3vw;
-                height: 8vw;
-                line-height: 8vw;
+                height: 10vw;
+                line-height: 10vw;
                 color: #63AAF5;
             }
         }
@@ -201,8 +223,9 @@ export default {
                 color:#999;
             }
         }
-        .mint-cell-wrapper{
+        .mint-cell-wrapper,.mint-cell:last-child{
             padding:0;
+            background-size:0;
         }
         .mint-cell,.city{
             border-bottom:1px solid #ccc;
@@ -213,7 +236,10 @@ export default {
         .mint-cell-title,.city span:nth-child(1){
             display: inline-block;
             text-align:left;
-            width:16vw;
+            width:16vw!important;
+        }
+        .picker-slot-right,.picker-slot-left{
+            text-align:center!important;
         }
     }
 </style>

@@ -3,7 +3,7 @@
     <!-- 首页轮播图 -->
     <mt-swipe class="index-swiper" :auto="4000">
       <mt-swipe-item  v-for="(item,index) in swiper" :key="index">
-        <img  class="pic-c-c" :src="item.image" :data="item.image"/>
+        <img  @click="toOther(item)" class="pic-c-c" :src="item.image" :data="item.image"/>
       </mt-swipe-item>
     </mt-swipe>
     <router-link to="/search" class="search">
@@ -15,7 +15,7 @@
     <nav class="index-nav f-r">
       <router-link class="items f-c-c" v-for="(item,index) in navlist" :key="index" :to="item.link">
         <img  v-lazy="item.img" :data="item"/>
-        <p>{{item.tit}}</p>
+        <p style="margin-top:1.5vw">{{item.tit}}</p>
       </router-link>
     </nav>
     <!-- 首页导航栏 -->
@@ -88,10 +88,15 @@ export default {
       recommendlist:[],//名师推荐
       publiclist:[], // 公开课
       goodlist:[], // 好课推荐
+      token:'',
+      uid:'',
+      nickname:'', 
+      image:'',
+      integral:'',
     }
   },
   computed: {
-    ...mapState(['token']),
+    // ...mapState(['token']),
   },
   watch:{
     recommendlist(){
@@ -105,6 +110,25 @@ export default {
     },
   },
   created(){
+    if(this.$route.query.token){
+        this.token = this.$route.query.token
+        this.uid = this.$route.query.uid
+        this.nickname = this.$route.query.nickname
+        this.image = this.$route.query.image
+        this.integral = this.$route.query.integral
+        this.service_id = this.$route.query.service_id
+        localStorage.setItem('qtoken',this.token)
+        localStorage.setItem('qid',this.uid)
+        localStorage.setItem('qname',this.nickname)
+        localStorage.setItem('qimage',this.image)
+        localStorage.setItem('qintegral',this.integral)
+        localStorage.setItem('qservice_id',this.service_id)
+    }
+    const is_binding = this.$route.query.is_binding;
+    if(is_binding == 0){
+      this.$router.push('/bind-phone')
+      return
+    }
     const _this = this;
     let swiperdata = new FormData();
     let recommenddata = new FormData();
@@ -149,6 +173,7 @@ export default {
           _this.recommendlist = data.data
         }
     })
+
   },
   mounted(){
     const _this = this;
@@ -162,15 +187,20 @@ export default {
         type:'post',
         data,
         success(data) {
-          _this.setToken(data.data.token)
-          localStorage.setItem('qtoken',data.data.token)
-          localStorage.setItem('qid',data.data.uid)
+          // _this.setToken(data.data.token)
+          // localStorage.setItem('qtoken',data.data.token)
+          // localStorage.setItem('qid',data.data.uid)
         }
     })
   },
   methods:{
     ...mapActions(['setToken']),
     fix(){
+    },
+    toOther(item){
+      if(item.url){
+        window.location.href=item.url
+      }
     }
   },
 }
@@ -181,7 +211,7 @@ export default {
 .main{
   min-height:100%;
   background:#f5f5f5;
-  padding-bottom:8.1vw;
+  padding-bottom:10.1vw;
   .index-swiper{
     position: relative;
     width:100%;
@@ -262,6 +292,13 @@ export default {
   }
   .goodlist-content,.teacher-content{
     margin-top:2.7vw;
+    margin-bottom:5.4vw;
+  }
+  .goodlist-content{
+    margin-bottom:2.7vw;
+  }
+  .recommend-lists{
+    margin-top:-3vw;
   }
 }
 
@@ -273,12 +310,12 @@ export default {
         z-index:400;
         .mint-swipe-indicator{
           opacity: 1;
-          background:#ccc;
+          background:#fff;
         }
         .is-active{
           width:5.4vw;
           border-radius:1.6vw;
-          background:#fff;
+          background:#EB4C49;
         }
     }
   }

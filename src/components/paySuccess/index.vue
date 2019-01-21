@@ -2,9 +2,9 @@
   <div  class="pay-success">   
     <div class="t f-r-c">
         <i class="colorwx iconfont icon-menzhenjiaofei-zhifuchenggong"></i>
-        <span class="font16 color333">报名成功</span>
+        <span class="font16 color333">{{msg}}</span>
     </div>
-    <div class="go-my-class font14 color999">可在<router-link to="/">“学习-我的课程”</router-link>中查看哦~</div>
+    <div class="go-my-class font14 color999">可在<span class="jump" @click="jump">“{{data}}”</span>中查看哦~</div>
     <div class="go-back f-r-c">
         <span @click="toDetail" class="font18 colorbuy" to="/class-order-detail">查看详情</span>
         <router-link  class="font18 colorfff" to="/">返回首页</router-link>
@@ -22,17 +22,31 @@ export default {
   watch:{
 
   },
+  props:{
+  },
   data () {
     return {
         checked:false,
+        data:'',
+        msg:''
     }
+  },
+  created(){
+      this.data = this.$route.params.type == '1'? '学习-我的课程' :'我的订单'
+      this.msg = this.$route.params.type == '3'? '兑换成功' :'报名成功'
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
+      jump(){
+        if(this.$route.params.type == 1){
+            this.$router.push('/study/-1')
+        }else{
+            this.$router.push('/order-list/-1')
+        }
+      },
       checkboxOnclick(){
-          
       },
       toDetail(){
         this.$router.push('/order-detail/'+this.$route.params.id)
@@ -63,7 +77,7 @@ export default {
         } 
         .go-my-class{
             margin-top:8vw;
-            a{
+            .jump{
                 color:#63AAF5
             }
         }

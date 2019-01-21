@@ -11,7 +11,7 @@
             <p class="tit font16 color333 omit2 t-l">{{data.goods_name}}</p>
             <p class="f-r-sb">
                 <span class="colorbuy font16">{{data.integral}}积分</span>
-                <span class="font12 color999" style="line-height:5.4vw">库存{{data.sales_num}}件</span>
+                <span class="font12 color999" style="line-height:5.4vw">库存{{data.stock}}件</span>
             </p>
         </div>
         <div class="goods-info">
@@ -24,15 +24,18 @@
             <p class="desc font14 color333 t-l" v-html="data.content"></p>
         </div>
         <span @click="toOrder" class="btn-buy">立刻兑换</span>
+        <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
+import MsgBox from '@/components/common/MsgBox'
 
 // 积分商城页面
 export default {
   name: 'IntegralStore',
   components:{
+      MsgBox
   },
   watch:{
 
@@ -41,6 +44,8 @@ export default {
     return {
         swiper:[],// 轮播图片
         data:{}, // 商品详情
+        msgVisible:false,
+        msg:''
     }
   },
   created(){
@@ -63,8 +68,16 @@ export default {
      Common.InitImg()
   },
   methods:{
- 
     toOrder(){
+        const _this = this
+        if(this.data.stock == 0){
+            _this.msgVisible = true
+            _this.msg = '暂无库存'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },2000)
+            return
+        }
         this.$router.push('/integral-order/' + this.data.id)
     }
   }

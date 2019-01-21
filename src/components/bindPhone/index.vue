@@ -1,7 +1,13 @@
 <template>
-  <div  class="bind-phone f-c">   
-      <img class="logo" src="../../assets/img/dengluanquan@2x.png"/>
-      <p class="tit font14 color333">为了您的账户安全，请绑定手机号</p>
+  <div  class="bind-phone f-c">  
+      <div v-if="!isHide">
+        <img class="logo" src="../../assets/img/dengluanquan@2x.png"/>
+        <p class="tit font14 color333">为了您的账户安全，请绑定手机号</p>
+      </div> 
+      <div v-else>
+        <img class="logo" src="../../assets/img/yaoqing@2x.png"/>
+        <p class="tit font14 color333">接收邀请并成功绑定可获得{{integral}}积分</p>
+      </div>
       <div class="form">
           <div class="f-r phone">
               <i class="iconfont icon-shouji"></i>
@@ -14,16 +20,19 @@
             <mt-button v-else :disabled="true" class="code recode font10 colorbuy">{{time}}s后重试</mt-button>
           </div>
       </div>
-      <mt-button :disabled="!phone||!code" class="btn-submit">绑定</mt-button>
+      <mt-button @click="confirm" :disabled="!phone||!code" class="btn-submit">绑定</mt-button>
+      <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
+import MsgBox from '@/components/common/MsgBox'
 
 // 绑定手机页面
 export default {
   name: 'BindPhone',
   components:{
+      MsgBox
   },
   watch:{
 
@@ -34,26 +43,77 @@ export default {
         code:'',
         sendVisible:true,
         time:60,
-        timer:null
+        timer:null,
+        msgVisible:false,
+        msg:'',
+        isHide:false,
+        integral:'',
+        isWx:null
     }
+  },
+  created(){
+    this.isWx = this.$route.query.ixWx;
+    this.integral = this.$route.query.integral;
+    this.isHide = this.isWx == 1? true : false
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
       sendCode(){
-          const that = this;
-          this.time = 60;
-          clearInterval(this.timer)
-          this.sendVisible=false;
-          this.timer = setInterval(function(){
-              that.time --
-              if(that.time < 0){
-                  that.time = 0;
-                  that.sendVisible = true
-                  clearInterval(this.timer)
-              }
-          },1000)
+        const that = this;
+        let data = new FormData();
+        data.append('phone',this.phone)
+        this.ajax({
+            url: "/account/send-sms",
+            type:'post',
+            data,
+            success(data) {
+                if(data.code == 0){
+                    that.time = 60;
+                    clearInterval(that.timer)
+                    that.sendVisible=false;
+                    that.msg = '短信已发送'
+                    that.timer = setInterval(function(){
+                        that.time --
+                        if(that.time < 0){
+                            that.time = 0;
+                            that.sendVisible = true
+                            clearInterval(that.timer)
+                        }
+                    },1000)
+                }else{
+                    that.msg = data.msg
+                }
+                that.msgVisible = true
+                setTimeout(function(){
+                    that.msgVisible = false
+                },1000)
+            }
+        })
+      },
+      confirm(){
+        const _this = this
+        let data = new FormData();
+        data.append('token',localStorage.getItem('qtoken'))
+        data.append('phone',this.phone)
+        data.append('code',this.code)
+        this.ajax({
+            url: "/member/binding",
+            type:'post',
+            data,
+            success(data) {
+                if(data.code == 0){
+                    _this.$router.push('/')
+                }else{
+                    that.msgVisible = true
+                    that.msg = data.msg
+                    setTimeout(function(){
+                        that.msgVisible = false
+                    },1000)
+                }
+            }
+        })  
       }
   }
 }
@@ -99,6 +159,12 @@ export default {
             input{
                 // flex:1;
                 margin-left:2.7vw;
+                width:45vw;
+                height:100%;
+                border:0;
+                outline: none;
+                font-size:3.7vw;
+                margin-top:1vw;
             }
             .code{
                 position: absolute;

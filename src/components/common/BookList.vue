@@ -1,6 +1,6 @@
 <template>
   <div  class="book-lists"   
-        v-infinite-scroll="loadMore"
+         v-infinite-scroll="loadMore"
         infinite-scroll-disabled="loading"
         infinite-scroll-distance="10">
     <div 
@@ -9,12 +9,12 @@
         :key="index"
     >
        <div class="avatar">
-           <img class="pic-c-c" v-lazy="item.img" :data="item.img"/>
+           <img  class="pic-c-c" v-lazy="item.goods_cover" :data="item.goods_cover"/>
        </div>
        <div class="r">
-           <p class="tit omit1 font16 color333">{{item.tit}}</p>
-           <p class="amount font12">￥{{item.num}}</p>
-           <p class="font12 color666">销量：{{item.num}}</p>
+           <p class="tit omit1 font16 color333">{{item.goods_name}}</p>
+           <p class="amount font14">￥{{item.shop_price}}</p>
+           <p class="font14 color666">销量：{{item.sales_num}}</p>
        </div>
     </div>
   </div>
@@ -25,11 +25,14 @@ export default {
   name: 'BookList',
   props:{
     list:{},
-    onChange:{}
+    onChange:{},
+    loading: {
+        type: [Boolean],
+        default: false,
+    },
   },
   data () {
     return {
-        loading:false,
     }
   },
   mounted(){
@@ -38,12 +41,8 @@ export default {
   methods:{
     loadMore() {
         const that = this;
-        this.loading = true;
-        setTimeout(() => {
-            that.onChange()
-            that.loading = false;
-        }, 1000);
-    }
+        that.onChange()
+    },
   }
 }
 </script>
@@ -53,9 +52,9 @@ export default {
     .book-lists{
         width:100%;
         background:#fff;
-        padding:0px 2.7vw;
+        padding:5.4vw 2.7vw;
         .list{
-            margin:5.4vw 0;
+            margin-bottom:5.4vw;
         }
         .avatar{
             position: relative;
@@ -64,6 +63,11 @@ export default {
             overflow: hidden;
             border-radius: 1.6vw;
             margin-right:4vw;
+            background:#dedede;
+            img{
+                width:12.5vw!important;
+                height:16.8vw!important;
+            }
             .type{
                 position: absolute;
                 display: inline-block;
@@ -81,7 +85,7 @@ export default {
         }
         .r{
             flex:1;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #ddd;
             padding-bottom: 5.4vw;
             p{
                 text-align: left;

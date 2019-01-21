@@ -20,7 +20,7 @@ exports.cssLoaders = function (options) {
     options: {
       sourceMap: options.sourceMap
     }
-  }
+    }
 
   const postcssLoader = {
     loader: 'postcss-loader',

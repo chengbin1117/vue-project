@@ -27,10 +27,10 @@
                 </div>
             </div>
             <div class="foot-btn">
-                <router-link to="/add-address" class="btn">
+                <p @click="createAddress" class="btn">
                     <i class="iconfont icon-icon02"></i>
-                    <span class="font18">添加新的收获地址</span>
-                </router-link>
+                    <span class="font18">添加新的收货地址</span>
+                </p>
             </div>
         </div>
         <!-- 非空地址 -->
@@ -39,7 +39,7 @@
             <img src="../../assets/img/meiydizhi@2x.png"/>
             <p class="f-c-c">
                 <span class="font14 color999">暂无收货地址哦~</span>
-                <span class="font14 color999">前往<router-link to="/add-address" class="font14 colorblue">去添加</router-link></span>
+                <span class="font14 color999">前往<router-link to="/add-address/-1" class="font14 colorblue">去添加</router-link></span>
             </p>
         </div>
         <!-- 空地址 -->
@@ -65,21 +65,27 @@ export default {
   },
   created(){
       this.getData()
-      
       if(this.$route.params.id){
-          console.log(this.$route.params.id)
+        //   console.log(this.$route.params.id)
       }
+      console.log('window.history.go(-1)',)
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
+      createAddress(){
+           if(this.$route.params.id != '-1'){
+                this.$router.push('/add-address/' + this.$route.params.id)
+            }else{
+                this.$router.push('/add-address/-1')
+            }
+      },
       chooseAddress(item){
         const _this = this;
         if(this.$route.params.id != '-1'){
-            console.log(item)
             sessionStorage.setItem('address_id',item.id)
-             window.history.go(-1);
+            _this.$router.push(localStorage.getItem('lastPath'))
         }
       },
       getData(){
@@ -103,7 +109,7 @@ export default {
         })
       },
       editor(item){
-        this.$router.push('editor-address/' + item.id)
+        this.$router.push('/editor-address/' + item.id)
       },
       del(item){
         console.log('item',item)

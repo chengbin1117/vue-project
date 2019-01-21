@@ -8,35 +8,27 @@
     <order-status :data="data" class="status"/>
     <!-- 订单状态 -->
     <!-- 订单地址 -->
-    <order-address v-if="!isVirtual" :hideShadow="true" class="address"/>
+    <order-address :data="data" v-if="!isVirtual" :hideShadow="true" class="address"/>
     <!-- 订单地址 -->
     <div class="order-info">
         <p class="tit font16 color333 t-l">商品信息</p>
         <div class="goods-info f-r">
             <div class="l">
-                <img class="pic-c-c" v-lazy="data.target_data.goods_cover" :data='data.target_data.goods_cover'/>
+                <img class="pic-c-c" :src="data.image" :data='data.image'/>
                 <span v-if="isVirtual" class="type font10">{{data.target_data.course_type != 10 ? '录播课':'音频课'}}</span>
             </div>
             <div class="r f-c-c">
                 <p class="font16 color333 t-l omit1">{{data.goods_name}}</p>
                 <div v-if="!isSingle">
-                    <p v-if="!isIntegralGoods || isVirtual" class="font16 colorbuy mart10 t-l">￥{{data.target_data.shop_price}}</p>
+                    <p v-if="!isIntegralGoods || isVirtual" class="font16 colorbuy mart10 t-l">￥{{data.target_data.shop_price || data.target_data.price}}</p>
                     <p v-if="isIntegralGoods && !isVirtual" class="font16 colorbuy mart10 t-l">{{data.target_data.integral}}积分</p>
                 </div>
             </div>
         </div>
          <div v-if="isVirtual && isSingle" class="singly">
-            <p class="f-r-sb">
-                <span class="font16 color333 omit1">01 基本初等函数初等函数···</span>
-                <span class="font14 colorbuy omit1">￥35.00</span>
-            </p>
-             <p class="f-r-sb">
-                <span class="font16 color333 omit1">01 基本初等函数初等函数···</span>
-                <span class="font14 colorbuy omit1">￥35.00</span>
-            </p>
-             <p class="f-r-sb">
-                <span class="font16 color333 omit1">01 基本初等函数初等函数···</span>
-                <span class="font14 colorbuy omit1">￥35.00</span>
+            <p class="f-r-sb" v-for="(item,key) in data.catalog_data" :key="key">
+                <span class="font16 color333 omit1 t-l">{{item.course_name}}</span>
+                <span class="font14 colorbuy omit1">￥{{item.price}}</span>
             </p>
         </div>
     </div>
@@ -44,7 +36,7 @@
     <div v-if="isIntegralGoods && !isVirtual" class="integral f-c mart10">
         <p class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
-            <span class="font16 colorbuy">-3349积分</span>
+            <span class="font16 colorbuy">-{{data.integral}}积分</span>
         </p>
     </div>
     <!-- 实物积分 -->
@@ -57,22 +49,22 @@
     </div>
     <!-- 虚拟积分 -->
     <!-- 物流+金额 -->
-    <div  class="pay f-c mart10">
-        <p v-if="!isSingle" class="f-r-sb">
+    <div  v-if="!isIntegralGoods" class="pay f-c mart10">
+        <p v-if="!isSingle && data.charge_type !=10" class="f-r-sb">
             <span class="font16 color333">支付金额</span>
             <span class="font16 color999">￥{{data.price_all}}</span>
         </p>
-        <p v-if="!isSingle && isIntegralGoods" class="f-r-sb">
+        <p v-if="!isSingle && data.charge_type !=10" class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
             <span class="font16 color999">-￥{{data.integral}}</span>
         </p>
-        <p v-if="!isVirtual" class="f-r-sb">
+        <p v-if="!isVirtual " class="f-r-sb">
             <span class="font16 color333">物流配送</span>
             <span class="font16 color999">运费￥{{data.price_freight}}</span>
         </p>
-        <p class="f-r-sb">
+        <p v-if="!isIntegralGoods" class="f-r-sb">
             <span class="font16 color333">实付金额</span>
-            <span class="font16 colorbuy">￥{{data.price_pay}}</span>
+            <span class="font16 colorbuy">￥{{data.price_all}}</span>
         </p>
     </div>
     <!-- 物流+金额 -->
@@ -85,15 +77,15 @@
             <span class="font16 color333">下单时间：</span>
             <span class="font16 color999">{{data.create_time}}</span>
         </p>
-        <p class="f-r-sb">
+        <p v-if="data.status != 0" class="f-r-sb">
             <span class="font16 color333">支付时间：</span>
             <span class="font16 color999">{{data.pay_time}}</span>
         </p>
     </div>
-    <div class="order-detail-footer f-r-end">
-        <span class="white-btn">取消订单</span>
-        <span class="red-btn">支付订单</span>
-        <span v-if="false" class="red-btn">确认收货</span>
+    <div v-if="handleBtn" class="order-detail-footer f-r-end">
+        <span v-if="data.status == 0" class="white-btn">取消订单</span>
+        <span v-if="data.status == 0" class="red-btn">支付订单</span>
+        <span v-if="data.status == 20" class="red-btn">确认收货</span>
     </div>
   </div>
 </template>
@@ -122,6 +114,7 @@ export default {
         course:null, // 全套
         catalog:null, // 单个
         data:null,
+        handleBtn:true
     }
   },
   created(){
@@ -140,6 +133,9 @@ export default {
                 _this.isVirtual = data.order_type == 10 ? true : false
                 _this.isSingle = data.order_type == 10 && data.type_son == 0 ? true : false
                 _this.isIntegralGoods = data.order_type == 20 && data.type_son == 1 ? true : false
+                if(data.status == 40 || data.status == 10){
+                    _this.handleBtn = false
+                }
             }
         }
     }) 

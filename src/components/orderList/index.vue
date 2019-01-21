@@ -106,7 +106,6 @@ export default {
         target.className = 'active tabname'
         this.isVirtual = item === '1' ? false: true
         this.getData()
-        console.log(1)
       },
       changType(item){
         if(!this.isVirtual){

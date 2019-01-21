@@ -71,7 +71,8 @@ input::-webkit-input-placeholder{
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    -webkit-box-orient: vertical!important;
 }
 .omit2{
     /* overflow : hidden;
@@ -83,7 +84,8 @@ input::-webkit-input-placeholder{
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    -webkit-box-orient: vertical!important;
     height:9.6vw;
 }
 omit2{

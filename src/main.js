@@ -31,16 +31,15 @@ Vue.use(VueLazyLoad, {
 Vue.use(VideoPlayer)
 Vue.use(myaxios)
 Vue.config.productionTip = false
-console.log('token', localStorage.getItem('qtoken'))
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('qtoken')
-  if (to.name != 'index' && !token) {
-    next({path:'/'})
-  } else {
-    next()
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   const token = localStorage.getItem('qtoken')
+//   if (to.name != 'index' && !token) {
+//     next({path:'/'})
+//   } else {
+//     next()
+//   }
+// })
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

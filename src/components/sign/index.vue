@@ -11,7 +11,7 @@
                     <span class="font12 colorfff">连续签到赢积分</span>
                 </div>
             </div>
-            <router-link class="font14 color333" to="store">前往商城<i class="iconfont icon-qianwang"></i></router-link>
+            <router-link class="font14 color333" to="/my-integral">前往积分商城<i class="iconfont icon-qianwang"></i></router-link>
         </div>
     </div>
     <div class="b f-c">
@@ -177,7 +177,7 @@ export default {
                     width:16.6vw;
                     height:16.6vw;
                     background:#f2f2f2;
-                    border:1px solid #999;
+                    border:1px solid #ccc;
                     border-radius:50%;
                     margin-bottom:2.7vw;
                     span{

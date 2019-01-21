@@ -28,7 +28,22 @@ export default {
   components:{
   },
   watch:{
-
+    'form.user_name'(newVal,oldVal){
+        console.log(this.form.user_name)
+       this.disabledChange()
+    },
+    'form.phone'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.address'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.city'(newVal,oldVal){
+       this.disabledChange()
+    },
+    'form.province'(newVal,oldVal){
+       this.disabledChange()
+    },
   },
   data () {
     return {
@@ -87,6 +102,13 @@ export default {
     }
   },
   methods:{
+      disabledChange(){
+          if(this.form.user_name!='' &&this.form.phone!='' && this.form.address!=''&& this.form.city!=''&&this.form.province!=''){
+              this.disabled = false
+          }else{
+            this.disabled = true
+          }
+      },
      submit(){
         const _this = this;
         // 新增address-add
@@ -97,6 +119,7 @@ export default {
         data.append('province',this.form.province)
         data.append('city',this.form.city)
         data.append('address',this.form.address)
+        data.append('id',this.id)
         // 课程详情
         this.ajax({
             url: "/member/address-add",
@@ -104,7 +127,7 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.$router.push({path: '/my-address', replace: true})
+                    _this.$router.push({path: '/my-address/'+_this.$route.params.id, replace: true})
                 }
             }
         })
@@ -179,6 +202,7 @@ export default {
             }
             .placeholder{
                 color:#999;
+                font-size:3.8vw
             }
         }
         .address-picker{
@@ -192,8 +216,8 @@ export default {
                 text-align: right;
                 padding-right: 2.7vw;
                 font-size: 4.3vw;
-                height: 8vw;
-                line-height: 8vw;
+                height: 10vw;
+                line-height: 10vw;
                 color: #63AAF5;
             }
         }
@@ -209,8 +233,9 @@ export default {
                 color:#999;
             }
         }
-        .mint-cell-wrapper{
+        .mint-cell-wrapper,.mint-cell:last-child{
             padding:0;
+            background-size:0;
         }
         .mint-cell,.city{
             border-bottom:1px solid #ccc;
@@ -221,7 +246,10 @@ export default {
         .mint-cell-title,.city span:nth-child(1){
             display: inline-block;
             text-align:left;
-            width:16vw;
+            width:16vw!important;
+        }
+        .picker-slot-right,.picker-slot-left{
+            text-align:center;
         }
     }
 </style>

@@ -9,23 +9,23 @@
                         @pause="onPlayerPause($event)"
         >
         </video-player>
-        <div v-if="course.charge_type != 10" class="to-buy">
+        <div v-if="!isPlay" class="to-buy">
             <div  class="content f-c-c">
-                <span class="buy font16 ">购买学习</span>
-                <span class="info font14 colorfff mart10">购买后可学习整个课程</span>
+                <span @click="submit" class="buy font16 ">购买学习</span>
+                <span class="info font14 colorfff mart10">{{isCanPlay?'试看已结束,购买后学习整个课程':'购买后学习整个课程'}}</span>
             </div>
         </div>
     </div>
     <div v-if="!read" class="detail-tit f-c-c">
         <p class="tit font16 color333 t-l">{{course.course_name}}</p>
         <p class="info t-l f-r-sb">
-            <span v-if="course.charge_type == 10" class="f-c-c font16 colorfree">免费</span>
-            <span v-if="course.charge_type == 20" class="f-c-c font16 colorbuy">￥102.00</span>
+            <span v-if="course.charge_type == 10" class="f-c-c font16 colorfree mart10">免费</span>
+            <span v-if="course.charge_type == 20 && !course.time_limit" class="f-c-c font16 colorbuy mart10">￥{{course.price}}</span>
             <span v-if="course.charge_type == 20 && course.time_limit" class="f-c-c font16 colorlimit">限时观看</span>
-            <span class="f-c-c num font12 color999">{{course.sales_num}}人报名</span>
-            <span @click="allBuy" v-if="course.is_all == 0 && course.charge_type != 10" class="buy font12 colorbuy">全部购买</span>
+            <span class="f-c-c num font12 color999 mart10">{{course.sales_num}}人报名</span>
+            <span @click="allBuy" v-if="course.is_all == 0 && course.charge_type != 10" class="buy font14 colorbuy">全选</span>
         </p>
-        <p v-if="course.charge_type == 20 && course.time_limit"  class="font12 color999 t-l">(2018-09-14前免费观看，报名需购买)</p>
+        <p v-if="course.charge_type == 20 && course.time_limit"  class="font12 color999 t-l mart10">({{course.time_limit}}前免费观看，报名需购买)</p>
     </div>
     <div v-else class="detail-tit f-c-c">
         <p class="tit font16 color333 t-l">{{course.course_name}}</p>
@@ -36,13 +36,13 @@
                 </div>
                 <span class="font14 color333 f-c-c">{{course.teacher_name}}</span>
             </div>
-            <div class="chat-teacher f-r">
+            <div @click="chatTeacher(null)" class="chat-teacher f-r">
                 <i class="iconfont icon-liaotian"></i>
                 <span class="f-c-c font14 color333">联系老师</span>
             </div>   
         </div>
     </div>
-    <p v-if="course.is_all == 1" class="limit-warning">
+    <p v-if="course.is_all != 0 && course.charge_type != 10" class="limit-warning">
         <i></i>
         <span>本套课程仅支持整套购买</span>
     </p>
@@ -55,29 +55,30 @@
         <!-- 课程目录 -->
         <div v-if="!iscatalog" class="class-menu">
             <div class="item" v-for="(item,index) in catalog" :key="index">
-                <p  @click="toVideo(item)" class='video t-l f-r'>
-                    <span :class="['font12','f-c-c',item.status== 10 ? 'color333' :'color999']">视频</span>
-                    <span class="omit1 font14 color333 f-c-c">{{item.course_name}}</span>
-                    <span v-if="course.charge_type != 10" class="price f-r">
-                        <span class="omit1 font14 colorbuy">￥{{item.price}}</span>
-                        <i @click="choose(item)" :class="[item.is_buy == 1 ? 'colorbuy' : 'color999','font20','iconfont','icon-select']"></i>
+                 <p @click="toVideo(item)" :class="['video','t-l','f-r',item.is_playing == 1 && item.status!=20? 'is-playing':'']">
+                    <span :class="['font12','f-c-c','class-type',item.status== 10 ? 'color333 border999' :'color999 bordereee']">视频</span>
+                    <span :class="[item.status== 10 ? 'color333' :'color999','omit1','font14','color333','f-c-c']">{{item.course_name}}</span>
+                    <span v-if="course.charge_type != 10 && course.is_all == 0" class="price f-r">
+                        <span v-if="item.is_buy !=1" :class="[ 'colorbuy','omit1','font14','f-c-c','item-price']">￥{{item.price}}</span>
+                        <i v-if="item.is_buy !=1" @click="choose($event,item)" :class="[item.is_checked == 1 ? 'colorbuy' : 'color999','font20','iconfont','icon-select']"></i>
+                        <span v-if="item.is_buy==1" style="margin-top:0" class="color999">已购买</span>
                     </span>
                 </p>
                 <p @click="toExercise(item)" class="exercise t-l f-r">
                     <span :class="['font12','f-c-c',item.status== 10 ? 'color333' :'color666']">练习</span>
-                    <span class="omit1 font14 color666 f-c-c ">{{item.course_name}}</span>
+                    <span :class="[item.status== 10 ? 'color333' :'color999','omit1','font14','f-c-c']">{{item.course_name}}</span>
                 </p>
             </div>
         </div>
         <!-- 课程详情 -->
-        <div v-else class="class-detail">
+        <div v-show="iscatalog" class="class-detail">
             <div class="f-r">
                 <span class="red-line"></span>
                 <span class="font16 color333">授课老师</span>
             </div>
             <div class="teacher f-r">
                 <div class="avatar">
-                    <img class="pic-c-c" v-lazy="course.teacher_img_path" :data="course.teacher_img_path"/>
+                    <img class="pic-c-c" :src="course.teacher_img_path" :data="course.teacher_img_path"/>
                 </div>
                 <span class="font14 color333">{{course.teacher_name}}</span>
             </div>
@@ -89,31 +90,35 @@
         </div>
     </div>
     <div v-if ="!read" class="detail-footer f-r">
-        <div class="f-c-c">
-            <i class="iconfont icon-dayi"></i>
-            <span class="font14 color333">答疑</span>
-        </div>
-        <div @click="collect" class="f-c-c">
-            <i v-if="course.is_collect == 0" class='iconfont icon-shoucang'></i>
-            <i v-else class="iconfont icon-wodeshoucang2-copy colorbuy"></i>
-            <span :class="['font14','color333',course.is_collect == 0 ? '' : 'colorbuy']">{{course.is_collect == 0 ? '收藏' : '已收藏'}}</span>
+        <div class="white-btn f-r">
+            <div @click="toServer" class="f-c-c">
+                <i class="iconfont icon-dayi"></i>
+                <span class="font14 color333">咨询</span>
+            </div>
+            <div @click="collect" class="f-c-c">
+                <i v-if="course.is_collect == 0" class='iconfont icon-shoucang'></i>
+                <i v-else class="iconfont icon-wodeshoucang2-copy colorbuy"></i>
+                <span :class="['font14','color333',course.is_collect == 0 ? '' : 'colorbuy']">{{course.is_collect == 0 ? '收藏' : '已收藏'}}</span>
+            </div>
         </div>
         <div @click="submit" class="submit">
             <span class="font18">立刻报名</span>
-            <span v-if="course.charge_type != 10" class="font14">（￥{{totalPrice}}）</span>
+            <span v-if="course.charge_type != 10" class="font14">（￥{{toFixed(totalPrice)}}）</span>
         </div>
     </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
  </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
 import ClassList from "@/components/common/ClassList"
+import MsgBox from '@/components/common/MsgBox'
 
 // 好课推荐页面
 export default {
   name: 'VideoDetail',
   components:{
-      ClassList
+      ClassList,MsgBox
   },
   watch:{
      course(){
@@ -138,11 +143,11 @@ export default {
         fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
         sources: [{
           type: "video/mp4",
-          src: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" //你的视频地址（必填）
+          src: "" //你的视频地址（必填）
         }],
-        poster: "poster.jpg", //你的封面地址
+        poster: require('../../assets/img/cover.png'), //你的封面地址
         width: document.documentElement.clientWidth,
-        notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+        notSupportedMessage: ' ', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
 //        controlBar: {
 //          timeDivider: true,
 //          durationDisplay: true,
@@ -157,26 +162,78 @@ export default {
       data:[1,2,3,4,5,6],
       iscatalog:false,
       course:{}, // 课程详情
-      catalog:{},// 课程目录
+      catalog:[],// 课程目录
       totalPrice:0, // 购买总价
       isall:false,
       chooseId:[],
       read:false,
+      disabled:false,
+      msgVisible:false,
+      isPlay:true,
+      intervaltimer:null,
+      isCanPlay:false
     }
   },
   created(){
-    this.getData()
-    this.read = this.$route.params.read == 0 ? false : true
+    const path = this.$route.path
+    localStorage.setItem('classPath',path)
   },
   mounted(){
      Common.InitImg()
+    this.getData()
+
   },
   methods:{
+    toServer(){
+        const _this = this;
+        if( localStorage.getItem('qservice_id') > 0){
+            this.$router.push('/chat/' + localStorage.getItem('qservice_id'))
+        }else{
+            this.msgVisible = true
+            this.msg = '客服暂时不在线'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+        }
+    },
+    chatTeacher(_id){
+        if(_id){
+            this.$router.push('/chat/' + _id)
+            return
+        }
+         this.$router.push('/chat/' + this.course.admin_uid)
+    },
     toExercise(item){
+        const _this = this
+        if(item.status == 20){
+            return
+        }
+        if((this.course.is_all != 0 && this.course.is_buy != 1) || (this.course.is_all == 0 && item.is_buy == 0)){
+            this.msgVisible = true
+            this.msg = '请先购买课程'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+            return
+        }
         this.$router.push('/exercises/' + item.id +'/' + item.course_id)
     },
     toVideo(item){
+
+        if(item.status == 20){
+            return
+        }
         this.playerOptions.sources[0].src = item.file_path
+        this.catalog.forEach(element=>{
+            element.is_playing = 0
+            if(item.id == element.id){
+                element.is_playing = 1
+            }
+        })
+        item.is_playing = 1
+
+        console.log('item',item)
+        console.log('this.catalog',this.catalog)
     },
     getData(){
       const _this = this;
@@ -189,10 +246,69 @@ export default {
         type:'post',
         data,
         success(data) {
+            //is_all == 0 为单买
+            let timer = parseInt(data.data.course.time_limit) * 1000
             data = data.data
            _this.course = data.course
+           _this.read = _this.course.is_buy == 1 ? true : false
+           if(data.course.time_limit){
+            _this.course.time_limit =  new Date(timer).getFullYear() + '-' + parseInt(new Date(timer).getMonth()+1 )+ '-' + new Date(timer).getDate()
+           }
+                      // 默认第一节课正在播放
+           data.catalog.forEach(item=>{
+                    item.is_playing = 0
+           })
+           data.catalog[0].is_playing = 1
            _this.catalog = data.catalog
+            // 判断该课程是否允许播放
+           if(data.course.charge_type == 10 || data.course.free_time){
+                _this.isPlay = true
+           }else{
+               _this.isPlay = false
+           }
+            // 判断是否为试看课程
+            _this.isCanPlay = data.course.free_time ? true : false
+            // 判断整套或单买时候的初始总价
+           if(data.course.is_all == 0){
+               //单买时候的总价
+                data.catalog.forEach(element => {
+                    // if(element.status != 20 &&  element.is_buy == 1){
+                    //      _this.totalPrice += parseInt(element.price)               
+                    //  }
+                     // 判断单买时候 是否购买课程
+                     if(element.is_buy == 1){
+                         element.is_checked = 1
+                     }else{
+                         element.is_checked = 0
+                     }
+                }); 
+           }else{
+               // 整套买时候的总价
+                _this.totalPrice = parseInt(data.course.price)
+           }
            _this.playerOptions.sources[0].src = data.course.file_path
+        //    _this.playerOptions.sources[0].src = 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4'
+           setTimeout(function(){
+                const myAudio = document.getElementsByTagName("video")[0];
+                const limittimer = _this.course.free_time * 60
+                if(myAudio != null){
+                    getAudioProgress();
+                    // 实时获取视频播放进度
+                    function getAudioProgress() {
+                        setTimeout(function () {
+                        const currentTime=myAudio.currentTime.toFixed(2);
+                        if( _this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
+                            if(limittimer < currentTime ){
+                                _this.isPlay = false
+                                myAudio.pause();
+                            }
+                        }
+                            getAudioProgress();
+                        }, 50);
+                    }
+                } 
+           },50)
+          
         }
        })
     },
@@ -215,51 +331,97 @@ export default {
     },
     // 立刻报名
     submit(){
-        this.chooseId = this.chooseId.join('')
-        if(this.course.is_buy == 0 || this.course.charge_type == 10){
-            // this.$router.push('order-detail/' + this.course.id)
+        const _this = this;
+        if(!this.catalog){
+             this.msgVisible = true
+            this.msg = '课程不存在'
+            setTimeout(function(){
+                _this.msgVisible = false
+            },1000)
+            return
+        }
+        if(this.course.is_all != 0 || this.course.charge_type == 10){
             this.$router.push({path: '/class-order/' + this.course.id +'/0', replace: true})
         }else{
-            this.$router.push('class-order/0/' +this.chooseId)
+            this.catalog.forEach(element => {
+                if( element.is_checked == 1 && element.is_buy != 1){
+                    this.chooseId.push(element.id)
+                }
+            });
+            if(this.chooseId.length == 0){
+                this.msgVisible = true
+                this.msg = '请选择要购买的课程'
+                setTimeout(function(){
+                    _this.msgVisible = false
+                },1000)
+                return
+            }
+            this.chooseId = this.chooseId.join(',')
+            this.$router.push('/class-order/0/' +this.chooseId)
         }
     },
-    // 全部购买
+   // 全部购买
     allBuy(){
         if(!this.isall){
             this.catalog.forEach(element => {
-                element.is_buy = 1
-                this.totalPrice += parseInt(element.price)
+                // if(element.status != 20){
+                    if( element.is_checked != 1 && element.is_buy !=1){
+                        element.is_checked = 1
+                        this.totalPrice += parseInt(element.price)
+                    }
+                // }
             }); 
             this.isall = true
         }else{
             this.catalog.forEach(element => {
-                element.is_buy = 0
+                element.is_checked = 0
             }); 
             this.isall = false
             this.totalPrice = 0
+            this.chooseId = []
         }   
-
-    },
-    // 选择购买课程
-    choose(item){
-        if(item.status == 20){
-            return
-        }
-        item.is_buy = item.is_buy == 1 ? 0 : 1;
         this.catalog.forEach(element => {
-            if(element.is_buy == 1){
-                this.totalPrice += parseInt(element.price)
-                this.chooseId.push(item.id)
-            }else{
-                this.totalPrice -= parseInt(element.price)
+            if( element.is_checked == 1 && element.is_buy !=1){
+                this.chooseId.push(element.id)
             }
         });
+         console.log(this.chooseId)
+    },
+    // 选择购买课程
+    choose(e,item){
+        const _this = this
+        e.stopPropagation();
+        e.preventDefault();
+        item.is_checked = item.is_checked == 1 ? 0 : 1;
+        if(item.is_checked == 1){
+            this.totalPrice += parseInt(item.price)
+             this.chooseId.push(item.id)
+        }else{
+             this.totalPrice -= parseInt(item.price)
+             this.chooseId.forEach((target,i)=>{
+                 if(target == item.id){
+                     _this.chooseId.splice(i,1)
+                 }
+             })
+        }
     },
     onPlayerPlay(player) {
-      console.log("play");
+      const _this = this;
+      const myvideo = document.getElementsByTagName('video')[0]
+      if(this.course.charge_type == 20 && !this.course.time_limit && this.course.free_time){
+           _this.course.free_time = parseInt(_this.course.free_time) * 60
+            this.intervaltimer = setInterval(function(){
+                if(_this.course.free_time <= 0){
+                    _this.isPlay = false
+                    myvideo.pause()
+                    clearInterval(_this.intervaltimer)
+                    return
+                }
+                _this.course.free_time --
+            },1000)
+      }
     },
     onPlayerPause(player){
-      console.log("pause");
     },
     // 切换tab
     tabChange(e,item){
@@ -271,6 +433,9 @@ export default {
             menus[i].className = 'menu font16 color333'
         }
         target.className = 'menu font16 color333 active'
+    },
+    toFixed(item){
+       return  parseInt(item).toFixed(2)
     }
   }
 }
@@ -320,7 +485,7 @@ export default {
                 .buy{
                     border:1px solid #eb4c49;
                     border-radius: 1.6vw;
-                    padding:2.7vw 3.2vw;
+                    padding:1.7vw 3.2vw;
                 }
             }
             .avatar{
@@ -417,20 +582,43 @@ export default {
                         }
                     }
                     .video{
-                        span:nth-child(1){                            
+                        .border999{                            
                             border:1px solid #999;
                             border-radius: 1.1vw;
+                        }
+                        .bordereee{
+                            border-color:#eee!important;
                         }
                         .price{
                             span{
                                 border:0;
                             }
                             .omit1{
-                                width:22vw;
+                                // width:22vw;
                             }
                             i{
                                 margin-top:-1vw;
                             }
+                        }
+                        .price{
+                            span{
+                                // display:inline-block;
+                                height:100%;
+                                margin-top:-1.6vw;
+                            }
+                            .font20{
+                                font-size:6.4vw;
+                            }
+                            .item-price{
+                                width:auto;
+                            }
+                        }
+                      
+                    }
+                    .is-playing{
+                        .class-type{
+                            border-color:#eb4c49;
+                            color:#eb4c49;
                         }
                     }
                 }
@@ -447,7 +635,7 @@ export default {
                 }
                 .teacher{
                     padding:4vw 0;
-                    border-bottom:1px solid #ccc;
+                    // border-bottom:1px solid #ccc;
                     .avatar{
                         position: relative;
                         width:9.4vw;
@@ -474,15 +662,18 @@ export default {
             position: fixed;
             left:0;
             bottom:0;
-            border-top:1px solid #ddd;
-            .f-c-c{
-                width:25%;
-                i{
-                    font-size:5.4vw;
-                     margin-top:-3.4vw;
-                }
-                span{
-                    margin-top:-2.4vw;
+            .white-btn{
+                width:50%;
+                border-top:1px solid #ddd;
+                .f-c-c{
+                    width:50%;
+                    i{
+                        font-size:5.4vw;
+                        margin-top:-3.4vw;
+                    }
+                    span{
+                        margin-top:-2.4vw;
+                    }
                 }
             }
             .submit{
@@ -491,6 +682,7 @@ export default {
                 height:100%;
                 text-align: center;
                 color:#fff;
+                border-top:1px solid #EB4C49;
             }
         }
     }

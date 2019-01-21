@@ -7,7 +7,7 @@
                 <span class="line">|</span>
                 <span @click="changeTab($event,'2')" class="tabname">老师</span>
             </div>
-            <span @click="handelEditor" class="editor">{{editor ? '取消':'编辑'}}</span>
+            <span v-if="visible" @click="handelEditor" class="editor">{{editor ? '取消':'编辑'}}</span>
         </div>
         <div :class="['collect-main', editor ? '':'']">
             <class-list   v-if="visible" v-show="tabName==='1'" :editor="editor" :list="classData" :onChange="getClassData" />
@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    <div v-if="editor" class="fooer">
+    <div v-if="editor && visible" class="fooer">
         <span @click="checkAll" class="font18 colorbuy">全选</span>
         <mt-button @click="handelDel" class="font18" type="danger">删除</mt-button>
     </div>
@@ -68,6 +68,7 @@ export default {
             success(data) {
                 if(data.data.length == 0){
                     _this.visible = false
+                    return
                 }
                 _this.visible = true
                 data.data.forEach(element =>{
@@ -142,6 +143,7 @@ export default {
         padding-top:2.7vw;
         .collect-content{
             background:#fff;
+            padding-bottom:13.5vw;
             .collect-header{
                 padding:4vw;
                 padding-bottom:0;
@@ -185,7 +187,7 @@ export default {
             width: 100%;
             height:13.4vw;
             background: #fff;
-            border-top:1px solid #ccc;
+            // box-shadow: 0 2px 3px #000;
             z-index: 666;
             display: flex;
             span{

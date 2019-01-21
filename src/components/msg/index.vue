@@ -1,33 +1,33 @@
 <template>
   <div  class="my-msg">   
-    <div class="system items f-r" @click="toSystemMsg">
+    <div class="system my-items f-r" @click="toSystemMsg">
         <div class="l f-c-c">
             <div class="avatar">
                 <img class="pic-c-c" src="../../assets/icon-xiaoxi.png" data="../../assets/icon-xiaoxi.png"/>
             </div>
-            <span class="total">{{sysTotal >= 99 ? '99+' : sysTotal}}</span>
+            <span v-if="systemData.count && systemData.count != 0" class="total">{{systemData.count >= 99 ? '99+' : systemData.count}}</span>
         </div>
-        <div class="r f-c-c">
+        <div class="r f-c-c" style="flex:1">
             <div class="f-r-sb">
-                <p class="tit font16 color333">{{systemData.content}}</p>
+                <p class="tit font16 color333">系统消息</p>
                 <p class="font12 color666">{{systemData.create_time}}</p>
             </div>
-            <p class="font14 color999 omit1">通知内容一行显示通知内容一行显示通知内容...</p>
+            <p class="font14 color999 omit1">{{systemData.msg}}</p>
         </div>
     </div>
-    <div class="items f-r" v-for="(item,index) in data" :key="index"> 
+    <div @click="toTeacher(item)" class="my-items f-r teacher-msg" v-for="(item,index) in data" :key="index"> 
         <div class="l f-c-c">
             <div class="avatar">
-                <img class="pic-c-c" src="../../assets/icon-xiaoxi.png" data="../../assets/icon-xiaoxi.png"/>
+                <img class="pic-c-c" :src="item.img_path" :data="item.img_path"/>
             </div>
-            <span class="total">{{item.total >= 99 ? '99+' : item.total}}</span>
+            <span v-if="item.msg_num  && item.msg_num  != 0"  class="total">{{item.msg_num >= 99 ? '99+' : item.msg_num}}</span>
         </div>
-        <div class="r f-c-c">
+        <div class="r f-c-c"  style="flex:1">
             <div class="f-r-sb">
-                <p class="tit font16 color333">{{item.content}}</p>
+                <p class="tit font16 color333">{{item.name}}</p>
                 <p class="font12 color666">{{item.create_time}}</p>
             </div>
-            <p class="font14 color999 omit1">通知内容一行显示通知内容一行显示通知内容...</p>
+            <p class="font14 color999 omit1">{{item.msg}}</p>
         </div>
     </div>
     <Footer />
@@ -50,33 +50,18 @@ export default {
     return {
         sysTotal:23,
         data:[],
-        systemData:[],
+        systemData:{},
         page:1,
     }
   },
   created(){
-    this.getData()
-    this.getTeacherMsg()
   },
   mounted(){
      Common.InitImg()
+    this.getTeacherMsg()
+
   },
   methods:{
-      getData(){
-        const _this = this
-        let data = new FormData()
-        data.append('token',localStorage.getItem('qtoken'))
-        data.append('page',this.page)
-        this.ajax({
-            url: "/member/message",
-            type:'post',
-            data,
-            success(data) {
-                data = data.data
-                _this.systemData = data[0]
-            }
-        }) 
-      },
       getTeacherMsg(){
         //   chat/list
         const _this = this;
@@ -88,13 +73,19 @@ export default {
             type:'post',
             data,
             success(data) {
-                data = data.data
-                _this.data = data
+                _this.data = data.data
+                _this.systemData = data.data2
+                if(_this.data.length == 0){
+                    document.getElementsByClassName('system')[0].style.border = 0
+                }
             }
         }) 
       },
       toSystemMsg(){
           this.$router.push('./system-msg')
+      },
+      toTeacher(item){
+           this.$router.push('./chat/'+item.to)
       }
   }
 }
@@ -110,8 +101,9 @@ export default {
     .my-msg{
         width:100%;
         background:#fff;
-        padding:0 2.7vw;        
-        .items{
+        padding:0 2.7vw;       
+        margin-top:2.7vw; 
+        .my-items{
             width:100%;
             height:24vw;
             background:#fff;
@@ -147,8 +139,12 @@ export default {
                     margin-bottom:3.8vw;
                 }
             }
+            .omit1{
+                line-height:4.8vw;
+                text-align: left;
+            }
         }
-        .items:last-child{
+        .my-items:last-child{
             border-bottom:0;
         }
     }

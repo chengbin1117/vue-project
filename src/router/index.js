@@ -6,7 +6,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export default new Router({
+  mode: 'history',
   routes: [
+    {
+      path: '/#/',
+      redirect: '/'
+    },
     {
       path: '/',
       name: 'index',
@@ -68,7 +73,7 @@ export default new Router({
       component: resolve => require(['@/components/classOrderDetail/index'], resolve)
     },
     {
-      path: '/pay-success/:id',
+      path: '/pay-success/:id/:type',
       name: 'PaySuccess',
       component: resolve => require(['@/components/paySuccess/index'], resolve)
     },
@@ -88,17 +93,17 @@ export default new Router({
       component: resolve => require(['@/components/exercises/index'], resolve)
     },
     {
-      path: '/result',
+      path: '/result/:id/:course_id',
       name: 'Result',
       component: resolve => require(['@/components/result/index'], resolve)
     },
     {
-      path: '/mistakes/:id/:catalog_id',
+      path: '/mistakes/:id/:catalog_id/:num',
       name: 'Mistakes',
       component: resolve => require(['@/components/mistakes/index'], resolve)
     },
     {
-      path: '/study',
+      path: '/study/:id',
       name: 'Study',
       component: resolve => require(['@/components/study/index'], resolve)
     },
@@ -188,7 +193,7 @@ export default new Router({
       component: resolve => require(['@/components/myAddress/index'], resolve)
     },
     {
-      path: '/add-address',
+      path: '/add-address/:id',
       name: 'AddAddress',
       component: resolve => require(['@/components/addAddress/index'], resolve)
     },
@@ -213,7 +218,7 @@ export default new Router({
       component: resolve => require(['@/components/sign/index'], resolve)
     },
     {
-      path: '/chat',
+      path: '/chat/:tid',
       name: 'Chat',
       component: resolve => require(['@/components/chat/index'], resolve)
     },
@@ -236,6 +241,11 @@ export default new Router({
       path: '/invite',
       name: 'Invite',
       component: resolve => require(['@/components/invite/index'], resolve)
+    },
+    {
+      path: '/bind-phone',
+      name: 'BindPhone',
+      component: resolve => require(['@/components/bindPhone/index'], resolve)
     }
   ]
 })
