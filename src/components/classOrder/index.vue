@@ -59,6 +59,7 @@
         </div>
         <div @click="confirm" class="confirm font18 colorfff t-c">确认支付</div>
     </div>
+    <span>{{testPay}}</span>
     <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
@@ -98,16 +99,20 @@ export default {
         is_integral:null, // 是否使用积分,
         img:'',
         msgVisible:false,
-        msg:''
+        msg:'',
+        wxConfig:{},
+        testPay:'支付数据'
     }
   },
   mounted(){
      Common.InitImg()
+     this.getWxInfo()
   },
   created(){
     const _this = this
-    this.course_id = this.$route.params.course_id
-    this.catalog_ids = this.$route.params.catalog_ids
+    const url = this.$route.params.course_id
+    this.course_id = url.split('_')[0]
+    this.catalog_ids = url.split('_')[1]
     let data = new FormData()
     data.append('token',localStorage.getItem('qtoken'))
     if( this.course_id != 0){
@@ -136,6 +141,36 @@ export default {
     }) 
   },
   methods:{
+      getWxInfo(){
+        const _this = this
+        //获取微信配置
+        let data = new FormData();
+        data.append('url',location.href)
+        this.ajax({
+            url: "/account/wx-config",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxConfig = data.data.config
+                _this.wxConfig.debug = true
+                _this.wxConfig.jsApiList = ["chooseWXPay"]
+                wx.config(_this.wxConfig)
+                // _this.wxReady()
+            }
+        }) 
+      },
+      wxPay(config){
+          wx.chooseWXPay({
+                timestamp: config.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                nonceStr: config.nonceStr, // 支付签名随机串，不长于 32 位
+                package: "prepay_id=" +config.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                paySign: config.paySign, // 支付签名
+                success: function (res) {
+                // 支付成功后的回调函数
+                }
+          });
+      },
       checkboxOnclick(){
         const _this = this;
         if(this.course.can_integral == 0){
@@ -160,6 +195,8 @@ export default {
         let is_integral = this.checked ? 1 : 0;
         let data = new FormData();
         data.append('token',localStorage.getItem('qtoken'))
+        console.log('wxConfig',this.wxConfig)
+        data.append('wx_config',this.wxConfig)
         if( this.course_id != 0){
             data.append('course_id',this.course_id)
             data.append('is_integral',is_integral)
@@ -172,7 +209,9 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.$router.push('/pay-success/'+ data.data + '/1')
+                    _this.testPay = data.pay_data
+                    _this.wxPay(data.pay_data)
+                    // _this.$router.push('/pay-success/'+ data.data + '/1')
                 }else{
                     _this.msgVisible = true
                     _this.msg = data.msg

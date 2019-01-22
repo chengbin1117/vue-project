@@ -63,7 +63,7 @@ export default new Router({
       component: resolve => require(['@/components/audioDetail/index'], resolve)
     },
     {
-      path: '/class-order/:course_id/:catalog_ids',
+      path: '/class-order/:course_id',
       name: 'ClassOrder',
       component: resolve => require(['@/components/classOrder/index'], resolve)
     },
