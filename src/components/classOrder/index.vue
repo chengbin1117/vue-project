@@ -60,6 +60,7 @@
         <div @click="confirm" class="confirm font18 colorfff t-c">确认支付</div>
     </div>
     <span>{{testPay}}</span>
+    <span>{{testData}}</span>
     <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
@@ -101,7 +102,8 @@ export default {
         msgVisible:false,
         msg:'',
         wxConfig:{},
-        testPay:'支付数据'
+        testPay:'支付数据',
+        testData:'数据'
     }
   },
   mounted(){
@@ -189,8 +191,6 @@ export default {
         }else{
             this.course.total = parseInt(this.course.price)
         }
-        console.log('checked',this.checked)
-
       },
       confirm(){
         const  _this = this;
@@ -212,10 +212,11 @@ export default {
             success(data) {
                 if(data.code == 0){
                     _this.testPay = data.pay_data
-                    if(_this.course.type == 10){
-                        _this.$router.push('/pay-success/'+ data.data + '/1')
+                    _this.testData = data.data
+                    if(data.pay_data){
+                          _this.wxPay(data.pay_data)
                     }else{
-                        _this.wxPay(data.pay_data)
+                         _this.$router.push('/pay-success/'+ data.data + '/1')
                     }
                 }else{
                     _this.msgVisible = true
