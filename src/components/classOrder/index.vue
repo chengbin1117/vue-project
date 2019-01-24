@@ -173,7 +173,7 @@ export default {
                 success: function (res) {
                 // 支付成功后的回调函数
                     _this.testPay = res
-                    if(res.code == 0){
+                    if(res.errMsg == 'chooseWXPay:ok'){
                         _this.$router.push('/pay-success/'+ id + '/1')
                     }
                 }
