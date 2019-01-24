@@ -52,6 +52,8 @@
         <i class="iconfont icon-jingshi"></i>
         <span>该商品购买不支持退货</span>
     </p>
+        <span>{{pay_data}}</span>
+
     <div class="order-footer f-r">
         <div class="footer-pay f-r-c">
             <span class="font14 color333">实付：</span>
@@ -95,7 +97,8 @@ export default {
         data2:{},
         msgVisible:false,
         msg:'',
-        wxConfig:{}
+        wxConfig:{},
+        pay_data:'支付数据'
     }
   },
   created(){
@@ -137,7 +140,7 @@ export default {
             data,
             success(data) {
                 _this.wxConfig = data.data.config
-                _this.wxConfig.debug = false
+                _this.wxConfig.debug = true
                 _this.wxConfig.jsApiList = ["chooseWXPay"]
                 wx.config(_this.wxConfig)
                 // _this.wxReady()
@@ -189,6 +192,7 @@ export default {
             type:'post',
             data,
             success(data) {
+                _this.pay_data = data.pay_data
                 if(data.pay_data){
                     _this.wxPay(data.pay_data,data.data)
                 }else{
