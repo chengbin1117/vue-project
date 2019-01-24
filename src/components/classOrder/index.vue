@@ -208,8 +208,6 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.testPay = data.pay_data
-                    _this.testData = data.data
                     if(data.pay_data){
                           _this.wxPay(data.pay_data,data.data)
                     }else{

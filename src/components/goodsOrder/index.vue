@@ -94,7 +94,8 @@ export default {
         },
         data2:{},
         msgVisible:false,
-        msg:''
+        msg:'',
+        wxConfig:{}
     }
   },
   created(){
@@ -114,16 +115,51 @@ export default {
             const data1 = data.data
             const data2 = data.data2
             _this.data = data1
-            _this.data.freight =  parseInt(_this.data.freight).toFixed(2)
-            _this.data.total = (_this.goodsNum * parseInt(data1.shop_price) + parseInt(data1.freight)).toFixed(2)
+            _this.data.freight =  parseFloat(_this.data.freight).toFixed(2)
+            _this.data.total = (_this.goodsNum * parseFloat(data1.shop_price) + parseFloat(data1.freight)).toFixed(2)
             _this.data2 = data2.addr ? data2.addr : null
         }
     })
   },
   mounted(){
      Common.InitImg()
+     this.getWxInfo()
   },
   methods:{
+    getWxInfo(){
+        const _this = this
+        //获取微信配置
+        let data = new FormData();
+        data.append('url',location.href)
+        this.ajax({
+            url: "/account/wx-config",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxConfig = data.data.config
+                _this.wxConfig.debug = false
+                _this.wxConfig.jsApiList = ["chooseWXPay"]
+                wx.config(_this.wxConfig)
+                // _this.wxReady()
+            }
+        }) 
+    },
+    wxPay(config,id){
+        const _this = this
+        wx.chooseWXPay({
+            timestamp: config.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+            nonceStr: config.nonceStr, // 支付签名随机串，不长于 32 位
+            package: config.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+            signType: config.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+            paySign: config.paySign, // 支付签名
+            success: function (res) {
+            // 支付成功后的回调函数
+                if(res.errMsg == 'chooseWXPay:ok'){
+                    _this.$router.push('/pay-success/'+ id + '/2')
+                }
+            }
+        });
+    },
       checkboxOnclick(){
           
       },
@@ -147,13 +183,16 @@ export default {
         data.append('province',this.data2.province)
         data.append('city',this.data2.city)
         data.append('address',this.data2.address)
+        data.append('wx_config',this.wxConfig)
         this.ajax({
             url: "/user/order-create-goods",
             type:'post',
             data,
             success(data) {
-                if(data.code == 0){
-                    _this.$router.push('/pay-success/' + data.data +'/2')
+                if(data.pay_data){
+                    _this.wxPay(data.pay_data,data.data)
+                }else{
+                    _this.$router.push('/pay-success/'+ data.data + '/2')
                 }
             }
         })
@@ -165,7 +204,7 @@ export default {
           }else{
               this.goodsNum --
           }
-           this.data.total = (this.goodsNum * parseInt( this.data.shop_price) + parseInt(this.data.freight)).toFixed(2)
+           this.data.total = (this.goodsNum * parseFloat( this.data.shop_price) + parseFloat(this.data.freight)).toFixed(2)
       },
       addNum(){
           const _this = this
@@ -178,7 +217,7 @@ export default {
             return
           }
           this.goodsNum ++
-          this.data.total = (this.goodsNum * parseInt( this.data.shop_price) + parseInt(this.data.freight)).toFixed(2)
+          this.data.total = (this.goodsNum * parseFloat( this.data.shop_price) + parseFloat(this.data.freight)).toFixed(2)
       }
       
   }
