@@ -128,7 +128,7 @@ export default {
     Common.InitImg()
     const _this = this
     if ("WebSocket" in window){
-        this.ws = new WebSocket("ws://112.74.193.145:11212");
+        this.ws = new WebSocket("ws://47.107.71.62:11212");
         this.ws.onopen = function(){
             var msg = "login";
             var send = {};

@@ -284,7 +284,7 @@ export default {
                 }); 
            }else{
                // 整套买时候的总价
-                _this.totalPrice = parseInt(data.course.price)
+                _this.totalPrice = parseFloat(data.course.price)
            }
            _this.playerOptions.sources[0].src = data.course.file_path
         //    _this.playerOptions.sources[0].src = 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4'
@@ -367,7 +367,7 @@ export default {
                 // if(element.status != 20){
                     if( element.is_checked != 1 && element.is_buy !=1){
                         element.is_checked = 1
-                        this.totalPrice += parseInt(element.price)
+                        this.totalPrice += parseFloat(element.price)
                     }
                 // }
             }); 
@@ -394,10 +394,10 @@ export default {
         e.preventDefault();
         item.is_checked = item.is_checked == 1 ? 0 : 1;
         if(item.is_checked == 1){
-            this.totalPrice += parseInt(item.price)
+            this.totalPrice += parseFloat(item.price)
              this.chooseId.push(item.id)
         }else{
-             this.totalPrice -= parseInt(item.price)
+             this.totalPrice -= parseFloat(item.price)
              this.chooseId.forEach((target,i)=>{
                  if(target == item.id){
                      _this.chooseId.splice(i,1)
@@ -435,7 +435,7 @@ export default {
         target.className = 'menu font16 color333 active'
     },
     toFixed(item){
-       return  parseInt(item).toFixed(2)
+       return  parseFloat(item).toFixed(2)
     }
   }
 }

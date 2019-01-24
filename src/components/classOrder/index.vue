@@ -59,8 +59,6 @@
         </div>
         <div @click="confirm" class="confirm font18 colorfff t-c">确认支付</div>
     </div>
-    <span>{{testPay}}</span>
-    <span>{{testData}}</span>
     <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
@@ -102,8 +100,6 @@ export default {
         msgVisible:false,
         msg:'',
         wxConfig:{},
-        testPay:'支付数据',
-        testData:'数据'
     }
   },
   mounted(){
@@ -132,10 +128,10 @@ export default {
             if(data.code == 0){
                 data = data.data
                 _this.course = data.course
-                _this.course.total = parseInt(_this.course.price)
+                _this.course.total = parseFloat(_this.course.price)
                 _this.catalog = data.catalog
                 data.catalog.forEach( (item)=>{
-                    _this.singlePrice += parseInt(item.price)
+                    _this.singlePrice += parseFloat(item.price)
                 })
                 _this.isIntegralGoods = data.course.integral == 0 ? false : true
             }
@@ -147,7 +143,6 @@ export default {
         const _this = this
         //获取微信配置
         let data = new FormData();
-        alert("location.href:"+location.href)
         data.append('url',location.href)
         this.ajax({
             url: "/account/wx-config",
@@ -155,7 +150,7 @@ export default {
             data,
             success(data) {
                 _this.wxConfig = data.data.config
-                _this.wxConfig.debug = true
+                _this.wxConfig.debug = false
                 _this.wxConfig.jsApiList = ["chooseWXPay"]
                 wx.config(_this.wxConfig)
                 // _this.wxReady()
@@ -172,7 +167,6 @@ export default {
                 paySign: config.paySign, // 支付签名
                 success: function (res) {
                 // 支付成功后的回调函数
-                    _this.testPay = res
                     if(res.errMsg == 'chooseWXPay:ok'){
                         _this.$router.push('/pay-success/'+ id + '/1')
                     }
@@ -191,9 +185,9 @@ export default {
             return 
         }
         if(this.checked){
-            this.course.total = parseInt(this.course.price) - parseInt(this.course.discount)
+            this.course.total = parseFloat(this.course.price) - parseFloat(this.course.discount)
         }else{
-            this.course.total = parseInt(this.course.price)
+            this.course.total = parseFloat(this.course.price)
         }
       },
       confirm(){
@@ -201,7 +195,6 @@ export default {
         let is_integral = this.checked ? 1 : 0;
         let data = new FormData();
         data.append('token',localStorage.getItem('qtoken'))
-        console.log('wxConfig',this.wxConfig)
         data.append('wx_config',this.wxConfig)
         if( this.course_id != 0){
             data.append('course_id',this.course_id)
@@ -233,7 +226,7 @@ export default {
         }) 
       },
       toFixed(item){
-          return parseInt(item).toFixed(2)
+          return parseFloat(item).toFixed(2)
       }
   }
 }
