@@ -130,6 +130,7 @@ export default {
             if(data.code == 0){
                 data = data.data
                 _this.course = data.course
+                console.log('data.course',data.course)
                 _this.course.total = parseInt(_this.course.price)
                 _this.catalog = data.catalog
                 data.catalog.forEach( (item)=>{
@@ -211,8 +212,11 @@ export default {
             success(data) {
                 if(data.code == 0){
                     _this.testPay = data.pay_data
-                    _this.wxPay(data.pay_data)
-                    // _this.$router.push('/pay-success/'+ data.data + '/1')
+                    if(_this.course.type == 10){
+                        _this.$router.push('/pay-success/'+ data.data + '/1')
+                    }else{
+                        _this.wxPay(data.pay_data)
+                    }
                 }else{
                     _this.msgVisible = true
                     _this.msg = data.msg

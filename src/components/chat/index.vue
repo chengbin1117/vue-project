@@ -259,20 +259,20 @@ export default {
       getWxInfo(){
         const _this = this
         //获取微信配置
-            let data = new FormData();
-            data.append('url',location.href)
-            this.ajax({
-                url: "/account/wx-config",
-                type:'post',
-                data,
-                success(data) {
-                   _this.wxConfig = data.data.config
-                   _this.wxConfig.debug = false
-                   _this.wxConfig.jsApiList = ["startRecord","stopRecord","playVoice","uploadVoice","downloadVoice","onVoiceRecordEnd","onVoicePlayEnd"]
-                   wx.config(_this.wxConfig)
-                   _this.wxReady()
-                }
-            }) 
+        let data = new FormData();
+        data.append('url',location.href)
+        this.ajax({
+            url: "/account/wx-config",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxConfig = data.data.config
+                _this.wxConfig.debug = false
+                _this.wxConfig.jsApiList = ["startRecord","stopRecord","playVoice","uploadVoice","downloadVoice","onVoiceRecordEnd","onVoicePlayEnd"]
+                wx.config(_this.wxConfig)
+                _this.wxReady()
+            }
+        }) 
       },
       touchend(){
       },
