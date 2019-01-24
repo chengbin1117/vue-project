@@ -132,7 +132,6 @@ export default {
             if(data.code == 0){
                 data = data.data
                 _this.course = data.course
-                console.log('data.course',data.course)
                 _this.course.total = parseInt(_this.course.price)
                 _this.catalog = data.catalog
                 data.catalog.forEach( (item)=>{
@@ -163,7 +162,8 @@ export default {
             }
         }) 
       },
-      wxPay(config){
+      wxPay(config,id){
+          const _this = this
           wx.chooseWXPay({
                 timestamp: config.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
                 nonceStr: config.nonceStr, // 支付签名随机串，不长于 32 位
@@ -173,7 +173,9 @@ export default {
                 success: function (res) {
                 // 支付成功后的回调函数
                     _this.testPay = res
-                    
+                    if(res.code == 0){
+                        _this.$router.push('/pay-success/'+ id + '/1')
+                    }
                 }
           });
       },
@@ -216,7 +218,7 @@ export default {
                     _this.testPay = data.pay_data
                     _this.testData = data.data
                     if(data.pay_data){
-                          _this.wxPay(data.pay_data)
+                          _this.wxPay(data.pay_data,data.data)
                     }else{
                          _this.$router.push('/pay-success/'+ data.data + '/1')
                     }
