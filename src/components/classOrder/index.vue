@@ -172,6 +172,8 @@ export default {
                 paySign: config.paySign, // 支付签名
                 success: function (res) {
                 // 支付成功后的回调函数
+                    _this.testPay = res
+                    
                 }
           });
       },
