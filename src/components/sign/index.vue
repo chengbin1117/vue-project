@@ -1,5 +1,5 @@
 <template>
-  <div  class="sign f-c" v-if="signData.is_sign">   
+  <div  class="sign f-c">   
     <div class="top">
         <p class="fen font14 color333">我的积分：<span class="colorbuy">{{signData.integral_user}}</span></p>
         <router-link  to="integral-rule" class=" rule font14 colorblue">积分规则</router-link>
@@ -16,7 +16,7 @@
     </div>
     <div class="b f-c">
         <p class="tit font16 color333">今日已签到<span class="colorbuy">+{{signData.get}}</span>，连续签到<span class="colorbuy">{{signData.days}}</span>天</p>
-        <div>
+        <div v-if="signData.integral">
             <div style="display:inline-block" class="f-c item f-item" v-for="(item,index) in signData.integral" :key="index">
                 <div :class="['circle','f-c-c',item.sign == 1 ? 'active': '']">
                     <span class="font16">{{item.integral}}</span>
