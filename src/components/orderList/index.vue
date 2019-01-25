@@ -9,7 +9,7 @@
         <span v-if="isVirtual" @click="changType(item)" :class="item.class" v-for="(item,index) in vOrderType" :key="index">{{item.name}}</span>
     </div>
     <div class="order-content">
-        <order-list-status v-if="visible" :isVirtual="isVirtual" :list="orderList" :onChange="getOrderList"/>
+        <order-list-status v-if="visible" :isVirtual="isVirtual" :list="orderList" :onChange="getOrderList" :getDataHandel="getData"/>
         <div v-else class="no-data f-c">
             <img src="../../assets/img/zanwudingdan@2x.png" />
             <span class="font14 color999">暂无相关订单，可以看看其他的哦~</span> 

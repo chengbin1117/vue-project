@@ -340,7 +340,7 @@ export default {
             return
         }
         if(this.course.is_all != 0 || this.course.charge_type == 10){
-            this.$router.push({path: '/class-order/' + this.course.id +'/0', replace: true})
+            this.$router.push({path: '/class-order/' + this.course.id +'_0', replace: true})
         }else{
             this.catalog.forEach(element => {
                 if( element.is_checked == 1 && element.is_buy != 1){
@@ -356,7 +356,7 @@ export default {
                 return
             }
             this.chooseId = this.chooseId.join(',')
-            this.$router.push('/class-order/0/' +this.chooseId)
+            this.$router.push('/class-order/0_' +this.chooseId)
         }
     },
    // 全部购买

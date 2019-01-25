@@ -83,7 +83,7 @@
         </p>
     </div>
     <div v-if="handleBtn" class="order-detail-footer f-r-end">
-        <!-- <span v-if="data.status == 0" class="white-btn">取消订单</span> -->
+        <span @click="cancelOrder" v-if="data.status == 0" class="white-btn">取消订单</span>
         <span @click="payHandle" v-if="data.status == 0" class="red-btn">支付订单</span>
         <span v-if="data.status == 20" class="red-btn">确认收货</span>
     </div>
@@ -148,6 +148,20 @@ export default {
                 }
             }
         })
+    },
+    cancelOrder(){
+        const _this = this
+        let data = new FormData();
+        data.append('token',localStorage.getItem('qtoken'))
+        data.append('id',this.$route.params.id)
+        this.ajax({
+            url: "/user/order-cancel",
+            type:'post',
+            data,
+            success(data) {
+                _this.getData()
+            }
+        }) 
     },
     payHandle(){
         const _this = this

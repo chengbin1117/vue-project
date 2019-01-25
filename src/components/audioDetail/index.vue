@@ -1,7 +1,7 @@
 <template>
- <div  v-if="course" class="detail-content">   
+ <div v-if="course" class="detail-content">   
     <div class="detail-play">
-        <audio id="audioPlay" :src="source" controls preload="auto" controlsList="nodownload"></audio> 
+        <audio  id="audioPlay" :src="source" controls preload="auto" controlsList="nodownload"></audio> 
         <div @click="play" class="play-btn">
             <span>{{h}}:</span>
             <span>{{m}}:</span>
@@ -130,7 +130,7 @@ export default {
   },
   data () {
     return {
-      source:'',
+      source:'http://qsjqcdn.sclonsee.com/201901/1548396852540.mp3',
       tab:[
           {name:'课程目录',id:'1',class:'font16 color333'},
           {name:'课程详情',id:'2',class:'font16 color333'}
@@ -159,10 +159,8 @@ export default {
       localStorage.setItem('classPath',path)
   },
   mounted(){
-    this.getData()
     Common.InitImg()
-    console.log('server',localStorage.getItem('qservice_id'))
-    console.log('12',null >0 == true)
+    this.getData()
   },
   methods:{
     toServer(){
@@ -270,39 +268,42 @@ export default {
                 _this.totalPrice = parseFloat(data.course.price).toFixed(2)
            }
                         
-           const myAudio = document.getElementById("audioPlay");
+           const myAudio = document.getElementById('audioPlay')
             const limittimer = _this.course.free_time * 60
-           if(myAudio != null){
-                getAudioProgress();
-                // 实时获取音频播放进度
-                function getAudioProgress() {
-                    setTimeout(function () {
-                    const currentTime=myAudio.currentTime.toFixed(2);
-                    if(_this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
-                        if(limittimer < currentTime ){
-                            _this.isPlay = false
-                            myAudio.pause();
-                        }
-                    }
-                    if(currentTime == myAudio.duration){
-                        return false
-                    }
-                        _this.h = Math.floor(currentTime/60/60%24);
-                        _this.m = Math.floor(currentTime/60%60);
-                        _this.s = Math.floor(currentTime%60);     
-                        if(_this.h < 10){
-                            _this.h = '0' + _this.h
-                        }
-                        if(_this.m < 10){
-                            _this.m = '0' + _this.m
-                        }
-                        if(_this.s < 10){
-                            _this.s = '0' + _this.s
-                        }
-                        getAudioProgress();
-                    }, 50);
-                }
-            }
+        //     console.log('limittimer',limittimer)
+        //     console.log('myAudio',myAudio)
+        //    if(myAudio != null){
+        //         getAudioProgress();
+        //         // 实时获取音频播放进度
+        //         function getAudioProgress() {
+        //             setTimeout(function () {
+        //             const currentTime=myAudio.currentTime.toFixed(2);
+        //             console.log('currentTime',currentTime)
+        //             if(_this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
+        //                 if(limittimer < currentTime ){
+        //                     _this.isPlay = false
+        //                     myAudio.pause();
+        //                 }
+        //             }
+        //             if(currentTime == myAudio.duration){
+        //                 return false
+        //             }
+        //                 _this.h = Math.floor(currentTime/60/60%24);
+        //                 _this.m = Math.floor(currentTime/60%60);
+        //                 _this.s = Math.floor(currentTime%60);     
+        //                 if(_this.h < 10){
+        //                     _this.h = '0' + _this.h
+        //                 }
+        //                 if(_this.m < 10){
+        //                     _this.m = '0' + _this.m
+        //                 }
+        //                 if(_this.s < 10){
+        //                     _this.s = '0' + _this.s
+        //                 }
+        //                 getAudioProgress();
+        //             }, 50);
+        //         }
+        //     }
         }
        })
     },
@@ -403,6 +404,38 @@ export default {
     play(){
         const _this = this
         const myAudio = document.getElementById("audioPlay");
+        const limittimer = _this.course.free_time * 60
+        if(myAudio != null){
+                getAudioProgress();
+                // 实时获取音频播放进度
+                function getAudioProgress() {
+                    setTimeout(function () {
+                    const currentTime=myAudio.currentTime.toFixed(2);
+                    if(_this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
+                        if(limittimer < currentTime ){
+                            _this.isPlay = false
+                            myAudio.pause();
+                        }
+                    }
+                    if(currentTime == myAudio.duration){
+                        return false
+                    }
+                        _this.h = Math.floor(currentTime/60/60%24);
+                        _this.m = Math.floor(currentTime/60%60);
+                        _this.s = Math.floor(currentTime%60);     
+                        if(_this.h < 10){
+                            _this.h = '0' + _this.h
+                        }
+                        if(_this.m < 10){
+                            _this.m = '0' + _this.m
+                        }
+                        if(_this.s < 10){
+                            _this.s = '0' + _this.s
+                        }
+                        getAudioProgress();
+                    }, 50);
+                }
+            }
         if (myAudio.paused) {
             myAudio.play();
         }else{
