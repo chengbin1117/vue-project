@@ -83,8 +83,8 @@
         </p>
     </div>
     <div v-if="handleBtn" class="order-detail-footer f-r-end">
-        <span v-if="data.status == 0" class="white-btn">取消订单</span>
-        <span v-if="data.status == 0" class="red-btn">支付订单</span>
+        <!-- <span v-if="data.status == 0" class="white-btn">取消订单</span> -->
+        <span @click="payHandle" v-if="data.status == 0" class="red-btn">支付订单</span>
         <span v-if="data.status == 20" class="red-btn">确认收货</span>
     </div>
   </div>
@@ -114,36 +114,91 @@ export default {
         course:null, // 全套
         catalog:null, // 单个
         data:null,
-        handleBtn:true
+        handleBtn:true,
+        wxConfig:{}
     }
   },
   created(){
-    const _this = this;
-    let data = new FormData();
-    data.append('token',localStorage.getItem('qtoken'))
-    data.append('id',this.$route.params.id)
-    this.ajax({
-        url: "/user/order-detail",
-        type:'post',
-        data,
-        success(data) {
-            if(data.code == 0){
-                data = data.data
-                _this.data = data
-                _this.isVirtual = data.order_type == 10 ? true : false
-                _this.isSingle = data.order_type == 10 && data.type_son == 0 ? true : false
-                _this.isIntegralGoods = data.order_type == 20 && data.type_son == 1 ? true : false
-                if(data.status == 40 || data.status == 10){
-                    _this.handleBtn = false
-                }
-            }
-        }
-    }) 
+      this.getData()
+      this.getWxInfo()
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
+    getData(){
+        const _this = this;
+        let data = new FormData();
+        data.append('token',localStorage.getItem('qtoken'))
+        data.append('id',this.$route.params.id)
+        this.ajax({
+            url: "/user/order-detail",
+            type:'post',
+            data,
+            success(data) {
+                if(data.code == 0){
+                    data = data.data
+                    _this.data = data
+                    _this.isVirtual = data.order_type == 10 ? true : false
+                    _this.isSingle = data.order_type == 10 && data.type_son == 0 ? true : false
+                    _this.isIntegralGoods = data.order_type == 20 && data.type_son == 1 ? true : false
+                    if(data.status == 40 || data.status == 10){
+                        _this.handleBtn = false
+                    }
+                }
+            }
+        })
+    },
+    payHandle(){
+        const _this = this
+        let data = new FormData();
+        data.append('token',localStorage.getItem('qtoken'))
+        data.append('id',this.$route.params.id)
+        this.ajax({
+            url: "/user/order-pay",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxPay(data.data)
+                // _this.wxReady()
+            }
+        }) 
+    },
+    getWxInfo(){
+        const _this = this
+        //获取微信配置
+        let data = new FormData();
+        data.append('url',location.href)
+        this.ajax({
+            url: "/account/wx-config",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxConfig = data.data.config
+                _this.wxConfig.debug = true
+                _this.wxConfig.jsApiList = ["chooseWXPay"]
+                wx.config(_this.wxConfig)
+                // _this.wxReady()
+            }
+        }) 
+    },
+    wxPay(config,id){
+        const _this = this
+        wx.chooseWXPay({
+            timestamp: config.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+            nonceStr: config.nonceStr, // 支付签名随机串，不长于 32 位
+            package: config.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+            signType: config.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+            paySign: config.paySign, // 支付签名
+            success: function (res) {
+            // 支付成功后的回调函数
+                if(res.errMsg == 'chooseWXPay:ok'){
+                    // _this.$router.push('/pay-success/'+ id + '/2')
+                    _this.getData()
+                }
+            }
+        });
+    },
   }
 }
 </script>

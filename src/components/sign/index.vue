@@ -28,7 +28,6 @@
         </div>
         <p class="warning font12 color999 t-l">连续签到7天以上积分数都跟第7天相同</p>
     </div>
-    <div>{{signData.integral}}</div>
   </div>
 </template>
 <script>

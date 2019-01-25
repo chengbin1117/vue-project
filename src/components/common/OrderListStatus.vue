@@ -84,7 +84,7 @@ export default {
             data,
             success(data) {
                 _this.wxConfig = data.data.config
-                _this.wxConfig.debug = true
+                _this.wxConfig.debug = false
                 _this.wxConfig.jsApiList = ["chooseWXPay"]
                 wx.config(_this.wxConfig)
                 // _this.wxReady()
