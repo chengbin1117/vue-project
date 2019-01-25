@@ -159,7 +159,9 @@ export default {
             type:'post',
             data,
             success(data) {
-                _this.getData()
+                if(data.code == 0){
+                    _this.$router.push('/order-list/-1')
+                }
             }
         }) 
     },
