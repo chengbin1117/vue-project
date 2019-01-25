@@ -1,12 +1,12 @@
 <template>
-  <div  class="sign f-c">   
+  <div  class="sign f-c" v-if="signData.is_sign">   
     <div class="top">
-        <p class="fen font14 color333">我的积分：<span class="colorbuy">{{data.integral_user}}</span></p>
+        <p class="fen font14 color333">我的积分：<span class="colorbuy">{{signData.integral_user}}</span></p>
         <router-link  to="integral-rule" class=" rule font14 colorblue">积分规则</router-link>
         <div class="sign-ring f-c-c">
-            <div @click="handleSign" :class="['out','f-c-c',data.is_sign == 1 ? 'is-sign' : '']">
+            <div @click="handleSign" :class="['out','f-c-c',signData.is_sign == 1 ? 'is-sign' : '']">
                 <div class="in f-c-c">
-                    <p>{{data.is_sign == 1 ? '已签':'签到'}}</p>
+                    <p>{{signData.is_sign == 1 ? '已签':'签到'}}</p>
                     <span class="line"></span>
                     <span class="font12 colorfff">连续签到赢积分</span>
                 </div>
@@ -15,9 +15,9 @@
         </div>
     </div>
     <div class="b f-c">
-        <p class="tit font16 color333">今日已签到<span class="colorbuy">+{{data.get}}</span>，连续签到<span class="colorbuy">{{data.days}}</span>天</p>
+        <p class="tit font16 color333">今日已签到<span class="colorbuy">+{{signData.get}}</span>，连续签到<span class="colorbuy">{{signData.days}}</span>天</p>
         <div>
-            <div style="display:inline-block" class="f-c item f-item" v-for="(item,index) in data.integral" :key="index">
+            <div style="display:inline-block" class="f-c item f-item" v-for="(item,index) in signData.integral" :key="index">
                 <div :class="['circle','f-c-c',item.sign == 1 ? 'active': '']">
                     <span class="font16">{{item.integral}}</span>
                     <span class="font10">积分</span>
@@ -28,6 +28,7 @@
         </div>
         <p class="warning font12 color999 t-l">连续签到7天以上积分数都跟第7天相同</p>
     </div>
+    <div>{{signData.integral}}</div>
   </div>
 </template>
 <script>
@@ -44,7 +45,7 @@ export default {
   data () {
     return {
        isSign:false,
-       data:{}
+       signData:{}
     }
   },
   created(){
@@ -64,12 +65,12 @@ export default {
             data,
             success(data) {
                 data= data.data
-                _this.data = data
+                _this.signData = data
             }
         })      
     },
     handleSign(){
-        if(this.data.is_sign == 1){
+        if(this.signData.is_sign == 1){
             return
         }
         const _this = this;
