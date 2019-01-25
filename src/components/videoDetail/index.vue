@@ -219,7 +219,6 @@ export default {
         this.$router.push('/exercises/' + item.id +'/' + item.course_id)
     },
     toVideo(item){
-
         if(item.status == 20){
             return
         }

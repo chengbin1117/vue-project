@@ -39,7 +39,7 @@
             <img src="../../assets/img/meiydizhi@2x.png"/>
             <p class="f-c-c">
                 <span class="font14 color999">暂无收货地址哦~</span>
-                <span class="font14 color999">前往<router-link to="/add-address/-1" class="font14 colorblue">去添加</router-link></span>
+                <span @click="createAddress"  class="font14 color999">前往<span class="font14 colorblue">去添加</span></span>
             </p>
         </div>
         <!-- 空地址 -->
@@ -68,18 +68,17 @@ export default {
       if(this.$route.params.id){
         //   console.log(this.$route.params.id)
       }
-      console.log('window.history.go(-1)',)
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
       createAddress(){
-           if(this.$route.params.id != '-1'){
-                this.$router.push('/add-address/' + this.$route.params.id)
-            }else{
-                this.$router.push('/add-address/-1')
-            }
+        if(this.$route.params.id != '-1'){
+            this.$router.push('/add-address/' + this.$route.params.id)
+        }else{
+            this.$router.push('/add-address/-1')
+        }
       },
       chooseAddress(item){
         const _this = this;

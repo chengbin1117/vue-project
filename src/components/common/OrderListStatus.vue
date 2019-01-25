@@ -29,7 +29,7 @@
            </div>
        </div>
        <p class="order-price font14 color333 f-r-end">实付：<span class="font18 colorbuy">￥{{item.price_all}}</span><span v-if="!isVirtual">(含运费￥{{item.price_freight}})</span></p>
-       <div v-if="item.status == 0" class="order-pay f-r-end">
+       <div @click="payHandle(item)" v-if="item.status == 0" class="order-pay f-r-end">
            <span class="pay">立刻支付</span>
        </div>
   </div>
@@ -45,7 +45,8 @@ export default {
     isVirtual:{
         type:[Boolean],
         default:false
-    }
+    },
+    wxConfig:{}
   },
   data () {
     return {
@@ -53,9 +54,58 @@ export default {
     }
   },
   mounted(){
-     
+     this.getWxInfo()
   },
   methods:{
+    payHandle(item){
+        const _this = this
+        let data = new FormData();
+        data.append('token',localStorage.getItem('qtoken'))
+        data.append('id',item.id)
+        this.ajax({
+            url: "/user/order-pay",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxPay(data.data)
+                // _this.wxReady()
+            }
+        }) 
+    },
+    getWxInfo(){
+        const _this = this
+        //获取微信配置
+        let data = new FormData();
+        data.append('url',location.href)
+        this.ajax({
+            url: "/account/wx-config",
+            type:'post',
+            data,
+            success(data) {
+                _this.wxConfig = data.data.config
+                _this.wxConfig.debug = true
+                _this.wxConfig.jsApiList = ["chooseWXPay"]
+                wx.config(_this.wxConfig)
+                // _this.wxReady()
+            }
+        }) 
+    },
+    wxPay(config,id){
+        const _this = this
+        wx.chooseWXPay({
+            timestamp: config.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+            nonceStr: config.nonceStr, // 支付签名随机串，不长于 32 位
+            package: config.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+            signType: config.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+            paySign: config.paySign, // 支付签名
+            success: function (res) {
+            // 支付成功后的回调函数
+                if(res.errMsg == 'chooseWXPay:ok'){
+                    // _this.$router.push('/pay-success/'+ id + '/2')
+                }
+            }
+        });
+    },
     loadMore() {
         const that = this;
         this.loading = true;
