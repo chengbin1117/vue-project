@@ -46,11 +46,12 @@ export default {
         type:[Boolean],
         default:false
     },
-    wxConfig:{}
+    getDataHandel:{}
   },
   data () {
     return {
         loading:false,
+        wxConfig:{},
     }
   },
   mounted(){
@@ -102,6 +103,7 @@ export default {
             // 支付成功后的回调函数
                 if(res.errMsg == 'chooseWXPay:ok'){
                     // _this.$router.push('/pay-success/'+ id + '/2')
+                    _this.getDataHandel()
                 }
             }
         });
