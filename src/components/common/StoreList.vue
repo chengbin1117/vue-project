@@ -1,7 +1,7 @@
 <template>
   <div  class="store-list"   
         v-infinite-scroll="loadMore"
-        infinite-scroll-disabled="loading"
+        :infinite-scroll-disabled="loading"
         infinite-scroll-distance="10">
     <div 
         class="goods" 
@@ -31,7 +31,7 @@ export default {
   },
   data () {
     return {
-        loading:false,
+        // loading:false,
     }
   },
   mounted(){

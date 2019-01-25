@@ -220,6 +220,12 @@ export default {
             .f-item:nth-child(3){
                 margin-right:5vw;
             }
+            .f-item:last-child{
+                p{
+                    width:27vw;
+                    text-align: left;
+                }
+            }
         }
     }
 </style>

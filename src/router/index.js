@@ -241,11 +241,11 @@ export default new Router({
       path: '/invite',
       name: 'Invite',
       component: resolve => require(['@/components/invite/index'], resolve)
-    },
-    {
-      path: '/bind-phone',
-      name: 'BindPhone',
-      component: resolve => require(['@/components/bindPhone/index'], resolve)
     }
+    // {
+    //   path: '/bind-phone',
+    //   name: 'BindPhone',
+    //   component: resolve => require(['@/components/bindPhone/index'], resolve)
+    // }
   ]
 })
