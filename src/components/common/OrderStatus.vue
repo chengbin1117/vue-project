@@ -52,7 +52,7 @@ export default {
         const _this = this
          var input = document.createElement("input");
             input.value = this.data.express_sn;
-            document.body.appendChild(input);
+            document.body.prepend(input);
             input.select();
             input.setSelectionRange(0, input.value.length), document.execCommand('Copy');
             document.body.removeChild(input);
