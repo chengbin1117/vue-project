@@ -36,7 +36,7 @@
     <div v-if="isIntegralGoods && !isVirtual" class="integral f-c mart10">
         <p class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
-            <span class="font16 colorbuy">-{{data.integral}}积分</span>
+            <span class="font16 colorbuy">-{{data.discount}}积分</span>
         </p>
     </div>
     <!-- 实物积分 -->

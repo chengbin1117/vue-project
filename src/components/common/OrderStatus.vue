@@ -10,7 +10,7 @@
             <span class="marr10">{{data.express}}</span>
             <span>{{data.express_sn}}<i @click="copy" v-if="data.status==20" class="iconfont icon-fuzhi colorblue"></i></span>
         </p>
-        <input style="opacity:0" id="copyTarget" :value="data.express_sn"/>
+        <!-- <input style="opacity:0" id="copyTarget" :value="data.express_sn"/> -->
     </div>
     <div class="f-c-c">
         <!-- 待付款 -->
@@ -50,9 +50,12 @@ export default {
   methods:{
       copy(){
         const _this = this
-        const target=document.getElementById("copyTarget");
-        target.select(); // 选择对象
-        document.execCommand("Copy"); // 执行浏览器复制命令
+         var input = document.createElement("input");
+            input.value = this.data.express_sn;
+            document.body.appendChild(input);
+            input.select();
+            input.setSelectionRange(0, input.value.length), document.execCommand('Copy');
+            document.body.removeChild(input);
         _this.msgVisible = true
         setTimeout(function(){
             _this.msgVisible = false
