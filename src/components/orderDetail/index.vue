@@ -64,7 +64,7 @@
         </p>
         <p v-if="!isIntegralGoods" class="f-r-sb">
             <span class="font16 color333">实付金额</span>
-            <span class="font16 colorbuy">￥{{data.price_all}}</span>
+            <span class="font16 colorbuy">￥{{data.price_pay}}</span>
         </p>
     </div>
     <!-- 物流+金额 -->

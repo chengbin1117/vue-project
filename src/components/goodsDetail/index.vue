@@ -121,6 +121,11 @@ export default {
                 margin-top:4vw;
                 text-indent: 5.4vw;
                 line-height: 5.4vw;
+                padding-bottom:13.4vw;
+                img{
+                    display: inline-block;
+                    width:80%;
+                }
             }
         } 
 
@@ -139,5 +144,15 @@ export default {
         background:#EB4C47;
       }
   }
+              .desc{
+                margin-top:4vw;
+                text-indent: 5.4vw;
+                line-height: 5.4vw;
+                padding-bottom:20px;
+                img{
+                    display: inline-block;
+                    width:80%;
+                }
+            }
 }
 </style>

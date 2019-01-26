@@ -39,7 +39,7 @@
           <p class="warning font12 color999">注：每套练习题根据首次练习成绩获得相应积分，之后的重复练习成绩不得积分。</p>
       </div>
       <div class="handel">
-          <router-link :to="'/exercises/'+ id +'/' +course_id">再刷一遍</router-link>
+          <router-link :to="'/'">返回首页</router-link>
           <router-link :to="goback">返回课程</router-link>
       </div>
   </div>

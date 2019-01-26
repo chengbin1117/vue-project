@@ -8,8 +8,9 @@
         <span v-if="data.status == 0" class="font14 color666 t-l mart10">{{data.order_auto_end > 0 ? '还剩'+data.order_auto_end+'分钟订单关闭' :'订单已关闭'}} </span>
         <p v-if="data.status == 20" class="font14 color666 t-l mart10">
             <span class="marr10">{{data.express}}</span>
-            <span>{{data.express_sn}}</span>
+            <span>{{data.express_sn}}<i @click="copy" v-if="data.status==20" class="iconfont icon-fuzhi colorblue"></i></span>
         </p>
+        <input style="opacity:0" id="copyTarget" :value="data.express_sn"/>
     </div>
     <div class="f-c-c">
         <!-- 待付款 -->
@@ -19,15 +20,17 @@
         <img v-if="data.status == 40" src="../../assets/img/yiwancheng@2x.png"/>
         <!-- 待付款 -->
     </div>
+    <msg-box v-if="msgVisible" :content="msg"/>
   </div>
 </template>
 <script>
 import Common from '@/assets/js/common.js'
-
+import MsgBox from '@/components/common/MsgBox'
 // 订单状态 组件
 export default {
   name: 'OrderStatus',
   components:{
+      MsgBox
   },
   props:{
       data:{}
@@ -37,14 +40,24 @@ export default {
   },
   data () {
     return {
-        
+        msgVisible:false,
+        msg:'复制成功'
     }
   },
   mounted(){
      Common.InitImg()
   },
   methods:{
-
+      copy(){
+        const _this = this
+        const target=document.getElementById("copyTarget");
+        target.select(); // 选择对象
+        document.execCommand("Copy"); // 执行浏览器复制命令
+        _this.msgVisible = true
+        setTimeout(function(){
+            _this.msgVisible = false
+        },1000)
+      },
   }
 }
 </script>

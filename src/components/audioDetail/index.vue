@@ -91,7 +91,7 @@
         <div class="white-btn f-r">
             <div @click="toServer" class="f-c-c">
                 <i class="iconfont icon-dayi"></i>
-                <span  class="font14 color333">咨询</span>
+                <span  class="font14 color333">客服</span>
             </div>
             <div @click="collect" class="f-c-c">
                 <i v-if="course.is_collect == 0" class='iconfont icon-shoucang'></i>
@@ -377,12 +377,33 @@ export default {
                 function getAudioProgress() {
                     setTimeout(function () {
                     const currentTime=myAudio.currentTime.toFixed(2);
-                    if( _this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
-                        if(limittimer < currentTime ){
-                            _this.isPlay = false
-                            myAudio.pause();
+                    if(_this.course.is_all == 0){
+                        try {                            
+                            _this.catalog.forEach((element)=>{
+                                if(element.file_path == _this.source && element.is_buy == 1){
+                                    _this.isPlay = true
+                                    throw new Error("EndIterative");
+                                }else{
+                                    if(limittimer < currentTime ){
+                                        _this.isPlay = false
+                                        myAudio.pause();
+                                    }
+                                }
+                            })
+                        } catch(e) {
+                            if(e.message!="EndIterative") throw e;
+                        };
+                    }else{
+                        if(_this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
+                            if(limittimer < currentTime ){
+                                _this.isPlay = false
+                                myAudio.pause();
+                            }
                         }
                     }
+
+
+
                     if(currentTime == myAudio.duration){
                         return false
                     }

@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <header>
-        <div class="l f-r">
+        <div style="position:relative" class="l f-r">
             <div class="select" @click="showSelect">
                 <span class="font14 color333">{{searchSelect}}</span>
                 <span class="down"></span>
@@ -13,8 +13,8 @@
             <div class="s-input f-r">
                 <i class="iconfont icon-sousuo font18 color999"></i>
                 <input v-model="searchVal" autofocus="true" class="font14 color333" placeholder="请输入搜索内容" />
-                <i @click="clear" v-if="searchVal" class="iconfont icon-shanchu1 font15 color999 marr10"></i>
             </div>
+            <i style="position:absolute;right:10px" @click="clear" v-if="searchVal" class="iconfont icon-shanchu1 font15 color999 marr10"></i>
         </div>
         <span class="r font14 color333 marl10" @click="onSearch">搜索</span>
     </header>

@@ -93,7 +93,7 @@
         <div class="white-btn f-r">
             <div @click="toServer" class="f-c-c">
                 <i class="iconfont icon-dayi"></i>
-                <span class="font14 color333">咨询</span>
+                <span class="font14 color333">客服</span>
             </div>
             <div @click="collect" class="f-c-c">
                 <i v-if="course.is_collect == 0" class='iconfont icon-shoucang'></i>
@@ -171,7 +171,8 @@ export default {
       msgVisible:false,
       isPlay:true,
       intervaltimer:null,
-      isCanPlay:false
+      isCanPlay:false,
+      canPlay:false,
     }
   },
   created(){
@@ -219,10 +220,21 @@ export default {
         this.$router.push('/exercises/' + item.id +'/' + item.course_id)
     },
     toVideo(item){
+        const _this = this
         if(item.status == 20){
             return
         }
+        this.playerOptions.sources[0].src = ''
         this.playerOptions.sources[0].src = item.file_path
+        if(_this.course.is_all == 0){
+            if(item.is_buy == 1){
+                _this.canPlay = true
+            }else{
+                _this.canPlay = false
+            }
+        }else{
+             _this.canPlay = false
+        }
         this.catalog.forEach(element=>{
             element.is_playing = 0
             if(item.id == element.id){
@@ -230,9 +242,6 @@ export default {
             }
         })
         item.is_playing = 1
-
-        console.log('item',item)
-        console.log('this.catalog',this.catalog)
     },
     getData(){
       const _this = this;
@@ -265,6 +274,7 @@ export default {
            }else{
                _this.isPlay = false
            }
+
             // 判断是否为试看课程
             _this.isCanPlay = data.course.free_time ? true : false
             // 判断整套或单买时候的初始总价
@@ -283,32 +293,18 @@ export default {
                 }); 
            }else{
                // 整套买时候的总价
-                _this.totalPrice = parseFloat(data.course.price)
+            _this.totalPrice = parseFloat(data.course.price)
            }
-                 _this.playerOptions.sources[0].src = data.course.file_path
-
-        //    _this.playerOptions.sources[0].src = data.course.file_path
-        //    setTimeout(function(){
-        //         const myAudio = document.getElementsByTagName("video")[0];
-        //         const limittimer = _this.course.free_time * 60
-        //         if(myAudio != null){
-        //             getAudioProgress();
-        //             // 实时获取视频播放进度
-        //             function getAudioProgress() {
-        //                 setTimeout(function () {
-        //                 const currentTime=myAudio.currentTime.toFixed(2);
-        //                 if( _this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
-        //                     if(limittimer < currentTime ){
-        //                         _this.isPlay = false
-        //                         myAudio.pause();
-        //                     }
-        //                 }
-        //                     getAudioProgress();
-        //                 }, 50);
-        //             }
-        //         } 
-        //    },50)
-          
+            _this.playerOptions.sources[0].src = data.course.file_path
+            if(_this.course.is_all == 0){
+                if(_this.catalog[0].is_buy == 1){
+                    _this.canPlay = true
+                }else{
+                    _this.canPlay = false
+                }
+            }else{
+                 _this.canPlay = false
+            }
         }
        })
     },
@@ -408,27 +404,34 @@ export default {
     onPlayerPlay(player) {
       const _this = this;
       const myvideo = document.getElementsByTagName('video')[0]
-      console.log('myvideo',myvideo)
-           setTimeout(function(){
-                const limittimer = _this.course.free_time * 6
-                if(myvideo != null){
-                    getAudioProgress();
-                    // 实时获取视频播放进度
-                    function getAudioProgress() {
-                        setTimeout(function () {
-                        const currentTime=myvideo.currentTime.toFixed(2);
-                        // console.log('currentTime',currentTime)
-                        if( _this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
-                            if(limittimer < currentTime ){
-                                _this.isPlay = false
-                                myvideo.pause();
-                            }
+    //   setTimeout(function(){
+        const limittimer = _this.course.free_time * 6
+        if(myvideo != null){
+            getAudioProgress();
+            // 实时获取视频播放进度
+            function getAudioProgress() {
+                setTimeout(function () {
+                const currentTime=myvideo.currentTime.toFixed(2);
+                if(_this.course.is_all == 0){
+                   if(!_this.canPlay){
+                        if(limittimer < currentTime ){
+                            _this.isPlay = false
+                            myvideo.pause();
                         }
-                            getAudioProgress();
-                        }, 50);
+                   }
+                }else{
+                    if(_this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
+                        if(limittimer < currentTime ){
+                            _this.isPlay = false
+                            myvideo.pause();
+                        }
                     }
-                } 
-           },50)
+                }
+                    getAudioProgress();
+                }, 50);
+            }
+        } 
+        // },50)
     },
     onPlayerPause(player){
     },
