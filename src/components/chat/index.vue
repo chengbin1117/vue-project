@@ -155,34 +155,7 @@ export default {
             }
         } 
         this.ws.onclose = function (e){
-            alert('断开连接111')
              reconnect("ws://47.107.71.62:11212");
-            //   reconnection();
-            // this.ws = new WebSocket("ws://47.107.71.62:11212");
-
-            // this.ws.onopen = function(){
-            //     var msg = "login";
-            //     var send = {};
-            //     send['role'] = 'U';
-            //     send['from'] = _this.uid;
-            //     send['to'] = _this.tid;
-            //     send['msg_type'] = 'text';
-            //     send['msg_content'] = msg;
-            //     send['event'] = 'userLogin';
-            //     _this.ws.send(JSON.stringify( send ));
-            // }
-            // this.ws.onmessage = function (e) { 
-            //     if(JSON.parse(e.data).data.from){
-            //         let res = JSON.parse(e.data).data;
-            //         if(res.from == _this.uid){
-            //             res.type = 2
-            //         }else{
-            //             res.type = 1
-            //         }
-            //         _this.data.push(res)
-            //         _this.srcoll()
-            //     }
-            // } 
         }; 
     }
     this.getWxInfo()

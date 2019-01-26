@@ -224,6 +224,11 @@ export default {
         if(item.status == 20){
             return
         }
+        if(_this.course.charge_type == 10 || _this.course.free_time || _this.course.is_buy == 1){
+            _this.isPlay = true
+        }else{
+            _this.isPlay = false
+        }
         this.playerOptions.sources[0].src = ''
         this.playerOptions.sources[0].src = item.file_path
         if(_this.course.is_all == 0){

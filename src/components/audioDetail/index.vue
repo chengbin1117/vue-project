@@ -151,7 +151,8 @@ export default {
       msg:'',
       isPlay:true,
       intervaltimer:null,
-      isCanPlay:false
+      isCanPlay:false,
+      canPlay:false,
     }
   },
   created(){
@@ -198,10 +199,26 @@ export default {
         this.$router.push('/exercises/' + item.id +'/' + item.course_id)
     },
     toAudio(item){
+        const _this = this
         if(item.status == 20){
             return
         }
+        if(_this.course.charge_type == 10 || _this.course.free_time || _this.course.is_buy == 1){
+            _this.isPlay = true
+        }else{
+            _this.isPlay = false
+        }
+        this.source = ''
         this.source = item.file_path
+         if(_this.course.is_all == 0){
+            if(item.is_buy == 1){
+                _this.canPlay = true
+            }else{
+                _this.canPlay = false
+            }
+        }else{
+             _this.canPlay = false
+        }
         if(this.catalog){
             this.catalog.forEach(item=>{
                 item.is_playing = 0
@@ -270,6 +287,15 @@ export default {
                         
            const myAudio = document.getElementById('audioPlay')
             const limittimer = _this.course.free_time * 60
+            if(_this.course.is_all == 0){
+                if(_this.catalog[0].is_buy == 1){
+                    _this.canPlay = true
+                }else{
+                    _this.canPlay = false
+                }
+            }else{
+                 _this.canPlay = false
+            }
         }
        })
     },
@@ -378,21 +404,12 @@ export default {
                     setTimeout(function () {
                     const currentTime=myAudio.currentTime.toFixed(2);
                     if(_this.course.is_all == 0){
-                        try {                            
-                            _this.catalog.forEach((element)=>{
-                                if(element.file_path == _this.source && element.is_buy == 1){
-                                    _this.isPlay = true
-                                    throw new Error("EndIterative");
-                                }else{
-                                    if(limittimer < currentTime ){
-                                        _this.isPlay = false
-                                        myAudio.pause();
-                                    }
-                                }
-                            })
-                        } catch(e) {
-                            if(e.message!="EndIterative") throw e;
-                        };
+                        if(!_this.canPlay){
+                            if(limittimer < currentTime ){
+                                _this.isPlay = false
+                                myAudio.pause();
+                            }
+                        }
                     }else{
                         if(_this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
                             if(limittimer < currentTime ){
@@ -401,9 +418,6 @@ export default {
                             }
                         }
                     }
-
-
-
                     if(currentTime == myAudio.duration){
                         return false
                     }
