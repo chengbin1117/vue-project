@@ -1,7 +1,7 @@
 <template>
   <div  class="order-list-status"   
         v-infinite-scroll="loadMore"
-        infinite-scroll-disabled="loading"
+        :infinite-scroll-disabled="loading"
         infinite-scroll-distance="10">
     <div 
         class="list f-c" 
@@ -46,11 +46,15 @@ export default {
         type:[Boolean],
         default:false
     },
-    getDataHandel:{}
+    getDataHandel:{},
+    loading: {
+        type: [Boolean],
+        default: false,
+    },
   },
   data () {
     return {
-        loading:false,
+        // loading:false,
         wxConfig:{},
     }
   },
@@ -58,6 +62,10 @@ export default {
      this.getWxInfo()
   },
   methods:{
+    loadMore() {
+        const that = this;
+        that.onChange()
+    },
     payHandle(item){
         const _this = this
         let data = new FormData();
@@ -102,19 +110,10 @@ export default {
             success: function (res) {
             // 支付成功后的回调函数
                 if(res.errMsg == 'chooseWXPay:ok'){
-                    // _this.$router.push('/pay-success/'+ id + '/2')
                     _this.getDataHandel()
                 }
             }
         });
-    },
-    loadMore() {
-        const that = this;
-        this.loading = true;
-        setTimeout(() => {
-            that.onChange()
-            that.loading = false;
-        }, 1000);
     },
     toDetail(item){
         this.$router.push('/order-detail/' + item.id)

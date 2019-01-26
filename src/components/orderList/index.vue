@@ -9,11 +9,12 @@
         <span v-if="isVirtual" @click="changType(item)" :class="item.class" v-for="(item,index) in vOrderType" :key="index">{{item.name}}</span>
     </div>
     <div class="order-content">
-        <order-list-status v-if="visible" :isVirtual="isVirtual" :list="orderList" :onChange="getOrderList" :getDataHandel="getData"/>
+        <order-list-status v-if="visible" :isVirtual="isVirtual" :list="orderList" :onChange="getMoreList" :getDataHandel="getData"/>
         <div v-else class="no-data f-c">
             <img src="../../assets/img/zanwudingdan@2x.png" />
             <span class="font14 color999">暂无相关订单，可以看看其他的哦~</span> 
         </div>
+        <p style="padding:2.7vw 0;"  v-if="loadMore" class="content-footer color999 font12">这里是底线~</p>
     </div>
   </div>
 </template>
@@ -52,7 +53,8 @@ export default {
         vOrderStatus:1, // 虚拟订单状态
         page:1,
         order_status:null,
-        visible:true
+        visible:true,
+        loadMore:false
     }
   },
   created(){
@@ -73,6 +75,37 @@ export default {
      Common.InitImg()
   },
   methods:{
+    getMoreList(){
+        if(this.loadMore){
+                return
+            }
+            this.page++
+            const _this = this;
+            let data = new FormData();
+            data.append('token',localStorage.getItem('qtoken'))
+            data.append('order_type',this.isVirtual ? 10 : 20)
+            data.append('page',this.page)
+            if(this.order_status != null){
+                data.append('status',this.order_status)
+            }
+            this.loadMore = true
+            this.ajax({
+                url: "/user/order-list",
+                type:'post',
+                data,
+                success(data) {
+                    if(data.data.length == 0){
+                        _this.loadMore = true
+                        return
+                    }
+                    _this.loadMore = false
+                    data = data.data;
+                    data.forEach(item=>{
+                        _this.orderList.push(item)
+                    })
+                }
+            })
+        },
       getData(){
         const _this = this;
         let data = new FormData();
@@ -105,6 +138,7 @@ export default {
         }
         target.className = 'active tabname'
         this.isVirtual = item === '1' ? false: true
+        this.page = 1
         this.getData()
       },
       changType(item){
@@ -122,6 +156,7 @@ export default {
             this.vOrderStatus = item.id
         }
         this.order_status = item.order_status;
+        this.page = 1
         this.getData()
 
       },

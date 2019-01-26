@@ -44,7 +44,7 @@
     <div v-if="isVirtual && !isSingle && isIntegralGoods" class="integral f-c mart10">
         <p class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
-            <span class="font14 color999">{{data.integral_desc}}</span>
+            <span class="font14 color999">{{data.discount}}</span>
         </p>
     </div>
     <!-- 虚拟积分 -->
@@ -56,7 +56,7 @@
         </p>
         <p v-if="!isSingle && data.charge_type !=10" class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
-            <span class="font16 color999">-￥{{data.integral}}</span>
+            <span class="font16 color999">-￥{{data.discount}}</span>
         </p>
         <p v-if="!isVirtual " class="f-r-sb">
             <span class="font16 color333">物流配送</span>
@@ -226,7 +226,6 @@ export default {
             success: function (res) {
             // 支付成功后的回调函数
                 if(res.errMsg == 'chooseWXPay:ok'){
-                    // _this.$router.push('/pay-success/'+ id + '/2')
                     _this.getData()
                 }
             }

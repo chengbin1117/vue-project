@@ -33,7 +33,14 @@ export default {
   },
   created(){
       this.data = this.$route.params.type == '1'? '学习-我的课程' :'我的订单'
-      this.msg = this.$route.params.type == '2'? '兑换成功' :'报名成功'
+      // type 1 课程 ， type 2 现金物品  type 3 积分兑换
+      if(this.$route.params.type == '1'){
+          this.msg = '报名成功'
+      }else if(this.$route.params.type == '2'){
+          this.msg = '购买成功'
+      }else if(this.$route.params.type == '3'){
+          this.msg = '兑换成功'
+      }
   },
   mounted(){
      Common.InitImg()

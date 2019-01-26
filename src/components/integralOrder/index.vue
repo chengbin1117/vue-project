@@ -123,7 +123,7 @@ export default {
             data,
             success(data) {
                 if(data.code == 0){
-                    _this.$router.push('/pay-success/' + data.data +'/2')
+                    _this.$router.push('/pay-success/' + data.data +'/3')
                 }else{
                     _this.msgVisible = true
                     _this.msg = data.msg
@@ -134,7 +134,6 @@ export default {
             }
         })
       },
-      
   }
 }
 </script>
