@@ -87,7 +87,7 @@ export default {
         gradeParentSelect:'0', // 年级父级被选中项
         gradeChildSelect:'0', // 年级子级被选中项
         subjectSelect:'全部', // 学科被选中项
-        otherSelect:'20', // 分类被选中项
+        otherSelect:'10', // 分类被选中项
         classData:[  
           {img:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2393687535,4107070201&fm=27&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'},
           {img:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1425427484,3693134195&fm=26&gp=0.jpg',name:'米娜',tit:'标题标题标题标题标题标题标题标题标题标题',type:'英语',class:'10节课',classType:"免费",num:'1002'},

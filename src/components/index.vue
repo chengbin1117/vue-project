@@ -81,8 +81,8 @@ export default {
       navlist:[
         {img:require('../assets/img/index/xiaoxue@2x.png'),tit:'小学',link:'/primary'},
         {img:require('../assets/img/index/chuzhong@2x.png'),tit:'初中',link:'/middle'},
-        {img:require('../assets/img/index/shipinke@2x.png'),tit:'录播课',link:'/audio'},
-        {img:require('../assets/img/index/yinpinke@2x.png'),tit:'音频课',link:'/video'},
+        {img:require('../assets/img/index/shipinke@2x.png'),tit:'录播课',link:'/video'},
+        {img:require('../assets/img/index/yinpinke@2x.png'),tit:'音频课',link:'/audio'},
         {img:require('../assets/img/index/mignshituijian@2x.png'),tit:'名师辅导',link:'/recommend-teacher'}
       ],// 首页导航栏
       recommendlist:[],//名师推荐

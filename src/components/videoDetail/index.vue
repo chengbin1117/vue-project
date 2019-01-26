@@ -143,17 +143,17 @@ export default {
         fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
         sources: [{
           type: "video/mp4",
-          src: "" //你的视频地址（必填）
+          src: "http://qsjqcdn.sclonsee.com/201901/1548475488365.mp4" //你的视频地址（必填）
         }],
         poster: require('../../assets/img/cover.png'), //你的封面地址
         width: document.documentElement.clientWidth,
         notSupportedMessage: ' ', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-//        controlBar: {
-//          timeDivider: true,
-//          durationDisplay: true,
-//          remainingTimeDisplay: false,
-//          fullscreenToggle: true  //全屏按钮
-//        }
+    //    controlBar: {
+    //      timeDivider: true,
+    //      durationDisplay: false,
+    //      remainingTimeDisplay: false,
+    //      fullscreenToggle: true  //全屏按钮
+    //    }
       },
       tab:[
           {name:'课程目录',id:'1',class:'font16 color333'},
@@ -260,7 +260,7 @@ export default {
            data.catalog[0].is_playing = 1
            _this.catalog = data.catalog
             // 判断该课程是否允许播放
-           if(data.course.charge_type == 10 || data.course.free_time){
+           if(data.course.charge_type == 10 || data.course.free_time || data.course.is_buy == 1){
                 _this.isPlay = true
            }else{
                _this.isPlay = false
@@ -285,28 +285,29 @@ export default {
                // 整套买时候的总价
                 _this.totalPrice = parseFloat(data.course.price)
            }
-           _this.playerOptions.sources[0].src = data.course.file_path
-        //    _this.playerOptions.sources[0].src = 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4'
-           setTimeout(function(){
-                const myAudio = document.getElementsByTagName("video")[0];
-                const limittimer = _this.course.free_time * 60
-                if(myAudio != null){
-                    getAudioProgress();
-                    // 实时获取视频播放进度
-                    function getAudioProgress() {
-                        setTimeout(function () {
-                        const currentTime=myAudio.currentTime.toFixed(2);
-                        if( _this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
-                            if(limittimer < currentTime ){
-                                _this.isPlay = false
-                                myAudio.pause();
-                            }
-                        }
-                            getAudioProgress();
-                        }, 50);
-                    }
-                } 
-           },50)
+                 _this.playerOptions.sources[0].src = data.course.file_path
+
+        //    _this.playerOptions.sources[0].src = data.course.file_path
+        //    setTimeout(function(){
+        //         const myAudio = document.getElementsByTagName("video")[0];
+        //         const limittimer = _this.course.free_time * 60
+        //         if(myAudio != null){
+        //             getAudioProgress();
+        //             // 实时获取视频播放进度
+        //             function getAudioProgress() {
+        //                 setTimeout(function () {
+        //                 const currentTime=myAudio.currentTime.toFixed(2);
+        //                 if( _this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
+        //                     if(limittimer < currentTime ){
+        //                         _this.isPlay = false
+        //                         myAudio.pause();
+        //                     }
+        //                 }
+        //                     getAudioProgress();
+        //                 }, 50);
+        //             }
+        //         } 
+        //    },50)
           
         }
        })
@@ -407,18 +408,27 @@ export default {
     onPlayerPlay(player) {
       const _this = this;
       const myvideo = document.getElementsByTagName('video')[0]
-      if(this.course.charge_type == 20 && !this.course.time_limit && this.course.free_time){
-           _this.course.free_time = parseInt(_this.course.free_time) * 60
-            this.intervaltimer = setInterval(function(){
-                if(_this.course.free_time <= 0){
-                    _this.isPlay = false
-                    myvideo.pause()
-                    clearInterval(_this.intervaltimer)
-                    return
-                }
-                _this.course.free_time --
-            },1000)
-      }
+      console.log('myvideo',myvideo)
+           setTimeout(function(){
+                const limittimer = _this.course.free_time * 6
+                if(myvideo != null){
+                    getAudioProgress();
+                    // 实时获取视频播放进度
+                    function getAudioProgress() {
+                        setTimeout(function () {
+                        const currentTime=myvideo.currentTime.toFixed(2);
+                        // console.log('currentTime',currentTime)
+                        if( _this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
+                            if(limittimer < currentTime ){
+                                _this.isPlay = false
+                                myvideo.pause();
+                            }
+                        }
+                            getAudioProgress();
+                        }, 50);
+                    }
+                } 
+           },50)
     },
     onPlayerPause(player){
     },

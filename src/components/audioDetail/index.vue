@@ -242,7 +242,7 @@ export default {
            _this.source = data.course.file_path
            _this.read = _this.course.is_buy == 1 ? true : false
            // 判断该课程是否允许播放
-           if(data.course.charge_type == 10 || data.course.free_time){
+           if(data.course.charge_type == 10 || data.course.free_time || data.course.is_buy != 1){
                 _this.isPlay = true
            }else{
                _this.isPlay = false
@@ -270,40 +270,6 @@ export default {
                         
            const myAudio = document.getElementById('audioPlay')
             const limittimer = _this.course.free_time * 60
-        //     console.log('limittimer',limittimer)
-        //     console.log('myAudio',myAudio)
-        //    if(myAudio != null){
-        //         getAudioProgress();
-        //         // 实时获取音频播放进度
-        //         function getAudioProgress() {
-        //             setTimeout(function () {
-        //             const currentTime=myAudio.currentTime.toFixed(2);
-        //             console.log('currentTime',currentTime)
-        //             if(_this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
-        //                 if(limittimer < currentTime ){
-        //                     _this.isPlay = false
-        //                     myAudio.pause();
-        //                 }
-        //             }
-        //             if(currentTime == myAudio.duration){
-        //                 return false
-        //             }
-        //                 _this.h = Math.floor(currentTime/60/60%24);
-        //                 _this.m = Math.floor(currentTime/60%60);
-        //                 _this.s = Math.floor(currentTime%60);     
-        //                 if(_this.h < 10){
-        //                     _this.h = '0' + _this.h
-        //                 }
-        //                 if(_this.m < 10){
-        //                     _this.m = '0' + _this.m
-        //                 }
-        //                 if(_this.s < 10){
-        //                     _this.s = '0' + _this.s
-        //                 }
-        //                 getAudioProgress();
-        //             }, 50);
-        //         }
-        //     }
         }
        })
     },
@@ -411,7 +377,7 @@ export default {
                 function getAudioProgress() {
                     setTimeout(function () {
                     const currentTime=myAudio.currentTime.toFixed(2);
-                    if(_this.course.charge_type == 20 && !_this.course.time_limit && _this.course.free_time){
+                    if( _this.course.is_buy==0 && _this.course.charge_type != 10 && !_this.course.time_limit){
                         if(limittimer < currentTime ){
                             _this.isPlay = false
                             myAudio.pause();
