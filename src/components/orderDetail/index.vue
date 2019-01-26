@@ -56,7 +56,8 @@
         </p>
         <p v-if="!isSingle && data.charge_type !=10" class="f-r-sb">
             <span class="font16 color333">积分抵扣</span>
-            <span class="font16 color999">-￥{{data.integral}}</span>
+            <span v-if="data.order_type == 20 && data.type_son == 1" class="font16 color999">-￥{{data.integral}}</span>
+            <span v-else class="font16 color999">-￥{{data.discount}}</span>
         </p>
         <p v-if="!isVirtual " class="f-r-sb">
             <span class="font16 color333">物流配送</span>
@@ -142,6 +143,7 @@ export default {
                     _this.isVirtual = data.order_type == 10 ? true : false
                     _this.isSingle = data.order_type == 10 && data.type_son == 0 ? true : false
                     _this.isIntegralGoods = data.order_type == 20 && data.type_son == 1 ? true : false
+                    // _this.intergalOrDiscount = 
                     if(data.status == 40 || data.status == 10){
                         _this.handleBtn = false
                     }
