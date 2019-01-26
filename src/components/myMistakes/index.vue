@@ -71,11 +71,9 @@ export default {
           item.unfold = !item.unfold
         },
         childClick(e,item,parent){
-            console.log('item',item)
             e = e || window.event;
             e.stopPropagation();
             this.$router.push('mistakes/' + item.id +"/" + item.catalog_id +'/'+parent.num)
-            console.log(item)
         }
   }
 }

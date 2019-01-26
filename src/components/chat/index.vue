@@ -152,6 +152,10 @@ export default {
                 _this.srcoll()
             }
         } 
+        this.ws.onclose = function (e){
+            alert('断开连接')
+            alert('e',e)
+        }; 
     }
     this.getWxInfo()
   },
@@ -198,8 +202,6 @@ export default {
                 //     }else{
                 //         btnElem.value = '松开手指，取消发送';
                 //     }
-                //     /*console.log(posStart+'---------');
-                //     console.log(posMove+'+++++++++');*/
                 // });
                 //***********************************//
                 //停止录音接口
@@ -360,7 +362,6 @@ export default {
             send['msg_content'] = value;
             send['event'] = 'sendMsg';
             _this.ws.send(JSON.stringify( send ));
-            // if(this.postdata.code == 0){
                 this.data.push(
                     {from: _this.uid,
                     img_path: _this.imgPath,
@@ -369,9 +370,7 @@ export default {
                     msg: value,
                     msg_type: type,
                     name: _this.myName})
-            // }
             this.value = ''
-            // Common.InitImg()
             this.srcoll()
       },
       play(item,index){
@@ -420,7 +419,6 @@ export default {
       },
       uploadImg(e){
           var target = e.target.files[0];
-          console.log('target',target)
           var subscription;
           var putExtra = {
             fname: Date.parse(new Date())+'/' + Math.floor(Math.random () * 900) + 100 + '/'+ target.name,
@@ -442,7 +440,6 @@ export default {
       next(res){
       },
       error(err){
-          console.log('err',err)
       },
       complete(res){
         this.sendMsg('image',this.qiData.domain+res.key)

@@ -33,7 +33,7 @@ export default {
   },
   created(){
       this.data = this.$route.params.type == '1'? '学习-我的课程' :'我的订单'
-      this.msg = this.$route.params.type == '3'? '兑换成功' :'报名成功'
+      this.msg = this.$route.params.type == '2'? '兑换成功' :'报名成功'
   },
   mounted(){
      Common.InitImg()

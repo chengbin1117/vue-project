@@ -381,7 +381,6 @@ export default {
                 this.chooseId.push(element.id)
             }
         });
-         console.log(this.chooseId)
     },
     // 选择购买课程
     choose(e,item){

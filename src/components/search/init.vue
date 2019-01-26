@@ -48,7 +48,6 @@ export default {
   methods:{
       onChange(item){
           this.getData(item)
-          console.log(item)
       },
       clear(){
           this.reset()

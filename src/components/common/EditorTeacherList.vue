@@ -55,7 +55,6 @@ export default {
         }, 1000);
     },
     toTeacher(item){
-        console.log(item.id)
         this.$router.push('teacher-detail/' +item.id)
     },
     handleChecked(item){

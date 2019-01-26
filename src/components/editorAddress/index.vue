@@ -29,7 +29,6 @@ export default {
   },
   watch:{
     'form.user_name'(newVal,oldVal){
-        console.log(this.form.user_name)
        this.disabledChange()
     },
     'form.phone'(newVal,oldVal){

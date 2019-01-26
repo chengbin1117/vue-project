@@ -66,7 +66,6 @@ export default {
   created(){
       this.getData()
       if(this.$route.params.id){
-        //   console.log(this.$route.params.id)
       }
   },
   mounted(){
@@ -111,7 +110,6 @@ export default {
         this.$router.push('/editor-address/' + item.id)
       },
       del(item){
-        console.log('item',item)
         const _this = this;
         // 删除地址
         let deldata = new FormData();
