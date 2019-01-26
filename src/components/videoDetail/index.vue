@@ -404,7 +404,7 @@ export default {
       const _this = this;
       const myvideo = document.getElementsByTagName('video')[0]
     //   setTimeout(function(){
-        const limittimer = _this.course.free_time * 6
+        const limittimer = _this.course.free_time * 60
         if(myvideo != null){
             getAudioProgress();
             // 实时获取视频播放进度

@@ -56,6 +56,8 @@
 <script>
 import Common from '@/assets/js/common.js'
 import '@/assets/js/recorder.js'
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
 // 聊天页面
 export default {
   name: 'Chat',
@@ -128,7 +130,7 @@ export default {
     Common.InitImg()
     const _this = this
     if ("WebSocket" in window){
-        this.ws = new WebSocket("ws://47.107.71.62:11212");
+        this.ws = new ReconnectingWebSocket("ws://47.107.71.62:11212");
         this.ws.onopen = function(){
             var msg = "login";
             var send = {};
@@ -153,8 +155,11 @@ export default {
             }
         } 
         this.ws.onclose = function (e){
-            alert('断开连接')
+            alert('断开连接111')
              reconnect("ws://47.107.71.62:11212");
+            //   reconnection();
+            // this.ws = new WebSocket("ws://47.107.71.62:11212");
+
             // this.ws.onopen = function(){
             //     var msg = "login";
             //     var send = {};
