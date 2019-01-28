@@ -28,7 +28,7 @@
                </p>
            </div>
        </div>
-       <p class="order-price font14 color333 f-r-end">实付：<span class="font18 colorbuy">￥{{item.price_pay}}</span><span v-if="!isVirtual">(含运费￥{{item.price_freight}})</span></p>
+       <p class="order-price font14 color333 f-r-end">实付：<span class="font18 colorbuy">￥{{totalPrice(item.price_pay,item.price_freight)}}</span><span v-if="!isVirtual">(含运费￥{{item.price_freight}})</span></p>
        <div @click="payHandle(item)" v-if="item.status == 0" class="order-pay f-r-end">
            <span class="pay">立刻支付</span>
        </div>
@@ -117,6 +117,9 @@ export default {
     },
     toDetail(item){
         this.$router.push('/order-detail/' + item.id)
+    },
+    totalPrice(a,b){
+        return (parseFloat(a) + parseFloat(b)).toFixed(2)
     }
   }
 }
